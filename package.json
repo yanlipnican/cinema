@@ -1,0 +1,10 @@
+{
+  "name": "cinema",
+  "version": "0.0.1",
+  "description": "Cinema web and backend solution",
+  "main": "app.js",
+  "scripts": {
+  },
+  "author": "Jan Lipnican <yanlipnican@gmail.com>",
+  "license": "MIT"
+}
