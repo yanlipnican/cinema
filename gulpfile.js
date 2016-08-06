@@ -1,6 +1,5 @@
 var gulp = require("gulp");
 var babel = require("gulp-babel");
-var watch = require("gulp-watch");
 var less = require("gulp-less");
 var nodemon = require("gulp-nodemon");
 
@@ -20,11 +19,6 @@ gulp.task("less", function(){
 	return gulp.src("src/frontend/styles/main.less")
 		.pipe(less())
 		.pipe(gulp.dest("public/styles/"));
-});
-
-gulp.task('watch', function(){
-	gulp.watch('src/backend/javascript/*.js', ['es6-node']);
-	gulp.watch('src/frontend/styles/*.less', ['less']);	
 });
 
 gulp.task('build', ['es6-node', 'less', 'es6-frontend']);
