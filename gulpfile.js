@@ -10,6 +10,12 @@ gulp.task("es6-node", function () {
     .pipe(gulp.dest("app/javascript"));
 });
 
+gulp.task("es6-frontend", function(){
+  return gulp.src("src/frontend/javascript/*.js")
+    .pipe(babel())
+    .pipe(gulp.dest("public/javascript/"));
+});
+
 gulp.task("less", function(){
 	return gulp.src("src/frontend/styles/main.less")
 		.pipe(less())
@@ -21,7 +27,7 @@ gulp.task('watch', function(){
 	gulp.watch('src/frontend/styles/*.less', ['less']);	
 });
 
-gulp.task('build', ['es6-node', 'less']);
+gulp.task('build', ['es6-node', 'less', 'es6-frontend']);
 
 gulp.task('devel', function () {
   	nodemon({ 
