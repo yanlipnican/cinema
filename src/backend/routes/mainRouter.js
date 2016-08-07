@@ -12,7 +12,13 @@ module.exports = (app) => {
 	});
 
 	app.get('/admin', (req, res) => {
-		res.render('admin-hp', {layout : 'admin'});
+		if(req.session.name) res.render('admin-hp', {layout : 'admin'});
+		else res.redirect('/admin/login');
+	});
+
+	app.get('/admin/login', (req, res) => {
+		if(req.session.name) res.redirect('/admin');
+		else res.render('admin-login', {layout : 'blank'});
 	});
 
 }

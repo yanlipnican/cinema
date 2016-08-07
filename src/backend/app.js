@@ -8,6 +8,7 @@ import express from 'express';
 import db from './dbConnection';
 import router from './routes/mainRouter';
 import handlebars from 'express-handlebars';
+import session from 'express-session';
 
 const app = express();
 const PORT = 6969;
@@ -15,6 +16,7 @@ const PORT = 6969;
 app.engine('handlebars', handlebars({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 app.set('views', './views')
+app.use(session({secret: '1203()*(@(*&#)Haskdjh20', resave: true, saveUninitialized: true}));
 app.use(express.static('public'));
 
 router(app);
