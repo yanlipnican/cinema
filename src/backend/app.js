@@ -10,9 +10,11 @@ import router from './router';
 import handlebars from 'express-handlebars';
 import session from 'express-session';
 import bodyParser from 'body-parser';
+import path from 'path';
 
 const app = express();
 const PORT = 6969;
+global.appRoot = path.resolve(__dirname);
 
 app.engine('handlebars', handlebars({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');

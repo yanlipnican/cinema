@@ -1,29 +1,25 @@
-// import all pages
+// router imports all pages from pages directory
 
-import admin from './pages/admin';
-import adminLogout from './pages/admin-logout';
-import adminLogin from './pages/admin-login';
-
-import homepage from './pages/homepage';
-import register from './pages/register';
-import notFound from './pages/404';
-
-//
+import glob from 'glob';
 
 module.exports = (app) => {
 
-	const setRoute = (page) => {
-		app.get(page.route, page.get);
-		app.post(page.route, page.post);
-	}
+	glob(appRoot + "/pages/*.js", (er, files) => {
+		
+		for (var i = 0; i < files.length; i++) {
+			let page = require(files[i]);
+			if(typeof(page.get) !== "undefined"){
+				app.get(page.route, page.get);
+			}
+			if(typeof(page.post) !== "undefined"){
+				app.post(page.route, page.post);
+			}
+		}
 
-	setRoute(admin);
-	setRoute(adminLogout);
-	setRoute(adminLogin);
-	setRoute(homepage);
-	setRoute(register);
+		app.get('*', (req, res) => {
+			res.render('404', {layout : 'blank'});
+		});
 
-	// 404 must always be last route
-	setRoute(notFound)
-
+	});
+	
 }

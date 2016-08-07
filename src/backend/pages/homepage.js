@@ -16,9 +16,7 @@ const get = (req, res) => {
 	});
 }
 
-const post = (req, res) => {
-	res.render('404', {layout : 'blank'});
-}
+const post = undefined;
 
 module.exports = {
 	title,

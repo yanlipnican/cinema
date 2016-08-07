@@ -13,9 +13,7 @@ const get = (req, res) => {
 	else res.redirect('/admin/login');
 }
 
-const post = (req, res) => {
-	res.render('404', {layout : 'blank'});
-}
+const post = undefined;
 
 module.exports = {
 	title,
