@@ -7,9 +7,10 @@ let schemas = {
 	}),
 
 	user : mongoose.Schema({
-		name  : String,
-		email : String,
-		password : String
+		name     : String,
+		email    : String,
+		password : String,
+		salt	 : String
 	})
 
 }
