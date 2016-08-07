@@ -6,12 +6,13 @@ module.exports = (app) => {
 
 		models.post.find(function (err, posts) {
 			let sendData;
-			if(err)
-				res.render('home', {posts, status : false});
-			else
-				res.render('home', {posts, status : true});
+			if(!err) res.render('home', {posts, title: 'Home'});
 		});
 
+	});
+
+	app.get('/admin', (req, res) => {
+		res.render('admin-hp', {layout : 'admin'});
 	});
 
 }
