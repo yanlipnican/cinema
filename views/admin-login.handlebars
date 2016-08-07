@@ -1,13 +1,20 @@
+
+
 <div class="admin-login row">
 	<h2>Login - Admin</h2>
-	<form role="form">
+	{{# if error }}
+		<div class="alert alert-danger">
+			<strong>Error!</strong> {{ error }}.
+		</div>
+	{{/if}}
+	<form role="form" action="/admin/login" method="POST">
 	  <div class="form-group">
 	    <label for="email">Email address:</label>
-	    <input type="email" class="form-control" id="email">
+	    <input type="email" name="email" class="form-control" id="email">
 	  </div>
 	  <div class="form-group">
 	    <label for="pwd">Password:</label>
-	    <input type="password" class="form-control" id="pwd">
+	    <input type="password" name="password" class="form-control" id="pwd">
 	  </div>
 	  <div class="checkbox">
 	    <label><input type="checkbox"> Remember me</label>
