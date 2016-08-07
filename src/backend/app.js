@@ -6,7 +6,7 @@
 
 import express from 'express';
 import db from './dbConnection';
-import router from './routes/mainRouter';
+import router from './router';
 import handlebars from 'express-handlebars';
 import session from 'express-session';
 import bodyParser from 'body-parser';
