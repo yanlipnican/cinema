@@ -15,6 +15,7 @@ const PORT = 6969;
 app.engine('handlebars', handlebars({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 app.set('views', './views')
+app.use(express.static('public'));
 
 router(app);
 
