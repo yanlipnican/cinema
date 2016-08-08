@@ -14,6 +14,7 @@ import path from 'path';
 
 const app = express();
 const PORT = 6969;
+
 global.appRoot = path.resolve(__dirname);
 
 app.engine('handlebars', handlebars({defaultLayout: 'main'}));
