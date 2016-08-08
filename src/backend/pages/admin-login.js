@@ -2,7 +2,7 @@
 *	Login to admin page
 */
 
-import models from '../models/mainModels';
+import models from '../models';
 import hash from '../hash';
 import helper from '../helpers'
 

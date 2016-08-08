@@ -3,7 +3,7 @@
 */
 
 // some imports
-import models from '../models/mainModels';
+import models from '../models';
 import helper from '../helpers'
 
 let title = 'Register new user';
