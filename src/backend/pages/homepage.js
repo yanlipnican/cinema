@@ -19,7 +19,6 @@ const get = (req, res) => {
 const post = undefined;
 
 module.exports = {
-	title,
 	route,
 	post,
 	get

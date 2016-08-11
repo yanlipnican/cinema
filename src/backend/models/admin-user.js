@@ -5,6 +5,8 @@ const model = {
 
 	name : 'adminuser',
 
+	access : false,
+	
 	schema : mongoose.Schema({
 		name     : String,
 		email    : String,

@@ -17,7 +17,7 @@ const get = (req, res) => {
 
 const post = (req, res) => {
 	if(!helper.isEmpty(req.body.email) && !helper.isEmpty(req.body.password)){
-		models.adminUser.find({email : req.body.email}, (err, users) =>{
+		models.adminuser.find({email : req.body.email}, (err, users) =>{
 			if(users.length > 0 && users[0].password === hash.password(req.body.password, users[0].salt)){
 				req.session.email = req.body.email;
 				res.redirect('/admin');
