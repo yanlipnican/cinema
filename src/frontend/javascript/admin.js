@@ -71,4 +71,40 @@ $(document).ready(() =>{
 
 	});
 
+
+	// edit data
+
+
+	$('.add-data #edit').click(function(e){
+
+		const address = $(this).attr('href');
+
+		const data = {};
+
+		$('.data').each(function(){
+			data[$(this).attr('name')] = $(this).val();
+		});
+
+		console.log(data);
+
+		$.ajax({
+			url : address,
+			method : 'POST',
+			data
+		}).done(function(response){
+			if(response.error){
+				alert(data.error);
+			} else {
+				alert(response.success);
+				let showDataAddr = '/admin/show-data/' + address.split('/')[3];
+				location.replace(showDataAddr);
+			}
+		}).fail(function(){
+			alert('Something went wrong, data hasnt been saved');
+		});
+
+		e.preventDefault();
+
+	});
+
 });

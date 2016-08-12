@@ -14,14 +14,20 @@
 <body>
 	<header>
 		<nav class="navbar navbar-default">
-		  <div class="container-fluid">
+		  <div class="container-fluid col-sm-10">
 		    <div class="navbar-header">
 		      <a class="navbar-brand" href="/" data-toggle="tooltip" data-placement="bottom" title="Back to home page">Admin - cinema</a>
 		    </div>
 		    <ul class="nav navbar-nav">
 		      <li><a href="/admin">Dashboard</a></li>
-		      <li><a href="/admin/logout">Logout</a></li> 
 		    </ul>
+		  </div>
+		  <div class="col-sm-2">
+		  	<div class="admin-head">
+		  		<a href="/admin/logout">Logout</a>
+		  		/
+				<a class="name" href="/admin/profile/{{ admin.name }}">{{ admin.name }}</a>
+			</div>
 		  </div>
 		</nav>
 	</header>

@@ -4,23 +4,39 @@
 *	
 */
 
-module.exports = (app) => {
 
-	app.get('/admin', (req, res) => {
-
+const get = (app, route, callback) => {
+	app.get(route, (req, res) => {
 		if(req.session._id){
 
-			const data = {
-				layout : 'admin',
-				cols : []
-			};
+			models.adminuser.findOne({ _id : req.session._id }, (err, admin) => {
+				
+				const data = {
+					admin: {
+						name : admin.name
+					}
+				};
 
-			for(let key in models){
-				if(models[key].access) data.cols.push(models[key]._name);
-			}
-			res.render('admin-hp.twig', data);
+				callback(req, res, data);
+
+			});
+
+		} else res.redirect('/admin/login');
+
+	});
+};
+
+module.exports = (app) => {
+
+
+	get(app, '/admin', (req, res, data) => {
+
+		data.cols = [];
+
+		for(let key in models){
+			if(models[key].access) data.cols.push(models[key]._name);
 		}
-		else res.redirect('/admin/login');
+		res.render('admin-hp.twig', data);
 
 	});
 
@@ -55,7 +71,7 @@ module.exports = (app) => {
 
 	app.post('/admin/get-collection-list', (req, res) =>{
 		
-		if(helper.isUndefined(req.session._id))res.redirect('/admin/login');
+		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
 			const data = { cols : []};
 
@@ -70,97 +86,118 @@ module.exports = (app) => {
 		}	
 	});
 
-	app.get('/admin/show-data/:col/:page?', (req, res) => {
+	get(app, '/admin/show-data/:col/:page?', (req, res, data) => {
 
-		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
-		else {
-			if(helper.isUndefined(req.params.col)) res.redirect('/admin');
-			else {
-				const data = {
-					layout : 'admin',
-					title : `Show - ${req.params.col}`,
-					colName : req.params.col 
+		data.title = `Show - ${req.params.col}`,
+		data.colName = req.params.col 
+
+		if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
+			models[req.params.col].find().limit(15).sort({createdAt : -1}).exec((err, documents) => {
+				data.col = [];
+				for (var i = 0; i < documents.length; i++) {
+					data.col.push(documents[i].toJSON());
 				}
+				res.render('show-data.twig', data);
+			});
+		} else {
+			data.error = 'Collection ' + req.params.col + ' not found.';
+			res.render('show-data.twig', data);
+		}
+		
+	});
 
-				if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
-					models[req.params.col].find().limit(15).sort({createdAt : -1}).exec((err, documents) => {
-						data.col = [];
-						for (var i = 0; i < documents.length; i++) {
-							data.col.push(documents[i].toJSON());
-						}
-						res.render('show-data.twig', data);
-					});
+	get(app, '/admin/edit-data/:col/:id', (req, res, data) => {
+
+		if(helper.isUndefined(models[req.params.col])){
+			data.error = 'Collection ' + req.params.col + ' not found.';
+			res.render('show-data.twig', data);
+		} else {
+			models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
+				if(document === null){
+					data.error = 'Document with id ' + req.params.id + ' not found.';
+					res.render('show-document.twig', data);
 				} else {
-					data.error = 'Collection ' + req.params.col + ' not found.';
-					res.render('show-data.twig', data);
+
+					data.title = `Edit ${req.params.col}`;
+					data.structure = models[req.params.col].structure;
+					data.document = document.toJSON();
+					data.colName = req.params.col;
+
+					res.render('admin-edit-data.twig', data);
 				}
-			}
+			});
 		}
 
 	});
+
+	app.post('/admin/edit-data/:col/:id', (req, res) => {
+		if(req.session._id){
+			if(helper.isUndefined(models[req.params.col])) res.json({error : `${req.params.col} not found.`});
+			else {
+
+				const data = {};
+
+				for(let key in req.body){
+					if(!helper.isUndefined(models[req.params.col].structure[key])){
+						data[key] = req.body[key] || "";
+					}
+				}
+
+				models[req.params.col].findOne({_id : req.params.id}, (err, doc) => {
+					if(doc !== null){
+						for(let key in req.body){
+							if(!helper.isUndefined(models[req.params.col].structure[key])){
+								doc[key] = req.body[key] || "";
+							}
+						}
+						doc.save();
+						res.json({success : `${req.params.col} has been edited.`});
+					} else res.json({error : `${req.params.col} not found.`});
+				});
+
+			}
+		} else res.json({error : 'no session'});
+	})
 
 	app.post('/admin/delete-data/:col/:id', (req, res) => {
 
-		if(helper.isUndefined(req.session._id)) res.json(false);
+		if(helper.isUndefined(req.session._id)) res.json({error : 'no session'});
 		else {
-			if(helper.isUndefined(req.params.col) && helper.isUndefined(req.params.id)) res.json({error : 'Undefined collection or id.'});
-			else {
-				models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
-					if(helper.isUndefined(document)) res.json({error : `${req.params.col} not found.`});
-					else {
-						document.remove();
-						res.json({success : `${req.params.col} has been removed.`});
-					}
-				});
-			}
-
+			models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
+				if(document === null) res.json({error : `${req.params.col} not found.`});
+				else {
+					document.remove();
+					res.json({success : `${req.params.col} has been removed.`});
+				}
+			});
 		}
 
 	});
 
-	app.get('/admin/add-data/:col', (req, res) => {
-		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
-		else {
-			if(helper.isUndefined(req.params.col)) res.redirect('/admin');
-			else {
+	get(app, '/admin/add-data/:col', (req, res, data) => {
+		if(!helper.isUndefined(models[req.params.col])){
+			data.title = `Add ${req.params.col}`;
+			data.structure = models[req.params.col].structure;
+			data.colName = req.params.col;
 
-				const data = {
-					title: `Add ${req.params.col}`,
-					structure: models[req.params.col].structure,
-					colName: req.params.col
-				}
-
-				res.render('admin-add-data.twig', data);
-
-			}
+			res.render('admin-add-data.twig', data);
+		} else {
+			data.error = 'Collection ' + req.params.col + ' not found.';
+			res.render('admin-add-data.twig', data);
 		}
+
 	});
 
 	app.post('/admin/add-data/:col', (req, res) => {
 		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
-			if(helper.isUndefined(req.params.col)) res.json({error: 'Collection doesnt exist'});
-			else {
-
-				/*
-				let allFilled = true;
-
-				for(let key in models[req.params.col].schema.tree){
-					if(models[req.params.col].schema.tree[key].name === "String"){
-						allow = !helper.isEmpty(req.body[key]);
-						break;
-					}
-				}
-
-				if(allFilled){
-
-				}
-				*/
-
+			if(!helper.isUndefined(models[req.params.col])){
 				const documentData = {};
 
 				for(let key in req.body){
-					documentData[key] = req.body[key] || "";
+					if(!helper.isUndefined(models[req.params.col].structure[key])){
+						documentData[key] = req.body[key] || "";
+					}
 				}
 
 				models.adminuser.findOne({_id : req.session._id}, (err, author)=>{
