@@ -17,6 +17,11 @@ const PORT = 6969;
 
 global.appRoot = path.resolve(__dirname);
 
+
+// Only for devel, if cache is disabled you don't need to restart server
+// if you modify twig templates
+twig.cache(false);
+
 app.set('view engine', 'twig');
 app.set('views', './views')
 app.use(session({secret: '1203()*(@(*&#)Haskdjh20', resave: true, saveUninitialized: true}));

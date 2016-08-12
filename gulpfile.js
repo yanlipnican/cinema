@@ -41,7 +41,7 @@ gulp.task('clean', function () {
 gulp.task('nodemon', function () {
     nodemon({ 
       script: 'app/app.js',
-        ext: 'html twig js less',
+        ext: 'html js less',
         ignore: [
             'app/',
             'node_modules/',
