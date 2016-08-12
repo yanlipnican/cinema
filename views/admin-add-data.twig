@@ -1,0 +1,22 @@
+{% extends 'admin-layout.twig' %}
+
+{% block content %}
+	<div class="container add-data">
+		<div class="row">
+			
+			<h2>{{ title }}</h2>
+			
+			{% for item in structure %}
+			    <div class="col-sm-2">
+			    	<h3>{{item}}</h3>
+			    </div>
+			    <div class="col-sm-10">
+			    	<textarea name="{{item}}" cols="30" rows="10"></textarea>
+			    </div>
+			{% endfor %}
+
+			<a id="add-new" href="/admin/add-data/{{ colName }}" class="btn">Add</a>
+
+		</div>
+	</div>
+{% endblock %}
