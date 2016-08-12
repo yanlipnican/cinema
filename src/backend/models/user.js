@@ -16,11 +16,14 @@ const model = {
 
 };
 
-model.schema.methods.exist = function(callback){
-	this.model(model.name).count({email : this.email}, (err, result) => {
-		let exist = result > 0;
-		callback(exist);
-	})
+model.schema.methods.exist = function(){
+	return new Promise((res, rej) => {
+
+		this.model(model.name).count({email : this.email}, (err, result) => {
+			res(result > 0);
+		});
+
+	});
 }
 
 model.schema.methods.createPassword = function(pass, callback) {

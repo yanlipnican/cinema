@@ -22,13 +22,14 @@ module.exports = (app) => {
 				email: req.body.email
 			});
 
-			user.exist((exist) => {
-				if(!exist){
-					user.createPassword(req.body.password);
-					user.save();
-					res.redirect('/login');
-				} else res.render('register', {layout : 'blank', error : 'User with this email exists'});
-			});
+			user.exist()
+				.then((exists) => {
+					if(!exists){
+						user.createPassword(req.body.password);
+						user.save();
+						res.redirect('/login');
+					} else res.render('register', {layout : 'blank', error : 'User with this email exists'});
+				});
 
 		} else {
 			res.render('register', {layout : 'blank', error : 'Fill all inputs'});

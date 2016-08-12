@@ -1,0 +1,44 @@
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+
+			{{#if error }}
+				<div class="alert alert-danger col-sm-12">
+					<strong>Error!</strong> {{ error }}
+				</div>
+
+			{{ else }}
+				
+				<h2>{{ title }}</h2>
+				<a href="/admin/add-new-data/{{ colName }}">Add new</a>
+
+				<table class="table">
+				    <thead>
+				      <tr>
+						<th>Title</th>
+						<th>Date</th>
+						<th>Author</th>
+						<th>-</th>
+				      </tr>
+				    </thead>
+				    <tbody>
+				      	{{#each col}}
+				      		<tr>
+								<td>{{ title }}</td>
+								<td>{{ date }}</td>
+								<td>{{ author }}</td>
+								<td>
+									<a href="/admin/edit-data/{{ ../colName }}/{{_id}}">Edit</a>
+									-
+									<a href="/admin/delete-data/{{ ../colName }}/{{_id}}">Delete</a>
+								</td>
+							</tr>
+						{{/each}}
+				    </tbody>
+				</table>
+
+			{{/if}}
+
+		</div>
+	</div>
+</div>

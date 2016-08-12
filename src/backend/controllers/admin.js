@@ -13,13 +13,13 @@ module.exports = (app) => {
 	app.get('/admin', (req, res) => {
 
 		const data = {
-			layout : 'admin'
+			layout : 'admin',
+			cols : []
 		}
 
 		if(req.session.email){
-			data.models = [];
 			for(let key in models){
-				if(models[key].access) data.models.push(models[key]._name);
+				if(models[key].access) data.cols.push(models[key]._name);
 			}
 			res.render('admin-hp', data);
 		}
@@ -56,7 +56,24 @@ module.exports = (app) => {
 		req.session.destroy();
 	});
 
-	app.get('/admin/add-data/:col/:page?', (req, res) => {
+	app.post('/admin/get-collection-list', (req, res) =>{
+		
+		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+
+		const data = { cols : []};
+
+		for (let key in models) {
+
+			if(models[key].access){
+				data.cols.push(models[key]._name);
+			}
+		}
+
+		res.json(data);
+	
+	});
+
+	app.get('/admin/show-data/:col/:page?', (req, res) => {
 
 		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
 		else {
@@ -64,18 +81,21 @@ module.exports = (app) => {
 			else {
 				const data = {
 					layout : 'admin',
-					title : 'Add data'
+					title : `Show - ${req.params.col}`,
+					colName : req.params.col 
 				}
 
 				if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
 					models[req.params.col].find().limit(15).exec((err, documents) => {
-						data.col = documents;
-						console.log(documents);
-						res.render('add-data', data);
+						data.col = [];
+						for (var i = 0; i < documents.length; i++) {
+							data.col.push(documents[i].toJSON());
+						}
+						res.render('show-data', data);
 					});
 				} else {
 					data.error = 'Collection ' + req.params.col + ' not found.';
-					res.render('add-data', data);
+					res.render('show-data', data);
 				}
 			}
 		}
