@@ -37,7 +37,7 @@ gulp.task('build', ['es6-node', 'less', 'es6-frontend']);
 gulp.task('devel', function () {
   	nodemon({ 
   		script: 'app/app.js',
-        ext: 'html js less',
+        ext: 'html twig js less',
         ignore: [
             'app/',
             'node_modules/',

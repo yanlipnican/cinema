@@ -11,7 +11,7 @@ import hash from '../hash';
 module.exports = (app) => {
 	
 	app.get('/register', (req, res) => {
-		res.render('register', {layout : 'blank'});
+		res.render('register.twig', {layout : 'blank'});
 	});
 
 	app.post('/register', (req, res) => {
@@ -28,11 +28,11 @@ module.exports = (app) => {
 						user.createPassword(req.body.password);
 						user.save();
 						res.redirect('/login');
-					} else res.render('register', {layout : 'blank', error : 'User with this email exists'});
+					} else res.render('register.twig', {layout : 'blank', error : 'User with this email exists'});
 				});
 
 		} else {
-			res.render('register', {layout : 'blank', error : 'Fill all inputs'});
+			res.render('register.twig', {layout : 'blank', error : 'Fill all inputs'});
 		}
 	});
 

@@ -1,0 +1,15 @@
+{% extends 'admin-layout.twig' %}
+
+{% block content %}
+    
+	<div class="dropdown">
+	  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Edit articles
+	  <span class="caret"></span></button>
+	  <ul class="dropdown-menu">
+	    {% for col in cols %}
+	      <li><a href="/admin/show-data/{{ col }}">{{ col }}</a></li>
+	    {% endfor %}
+	  </ul>
+	</div>
+
+{% endblock %}

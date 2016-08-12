@@ -20,7 +20,7 @@ module.exports = (app) => {
 			
 			data.posts = posts;
 
-			if(!err) res.render('home', data);
+			if(!err) res.render('home.twig', data);
 			else res.render('500', {layout : 'blank'});
 		});
 

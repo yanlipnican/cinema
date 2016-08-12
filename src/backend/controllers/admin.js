@@ -21,7 +21,7 @@ module.exports = (app) => {
 			for(let key in models){
 				if(models[key].access) data.cols.push(models[key]._name);
 			}
-			res.render('admin-hp', data);
+			res.render('admin-hp.twig', data);
 		}
 		else res.redirect('/admin/login');
 
@@ -29,7 +29,7 @@ module.exports = (app) => {
 
 	app.get('/admin/login', (req, res) => {
 		if(req.session.email) res.redirect('/admin');
-		else res.render('admin-login', {layout : 'blank'});
+		else res.render('admin-login.twig', {layout : 'blank'});
 	});
 
 	app.post('/admin/login', (req, res) => {
@@ -39,11 +39,11 @@ module.exports = (app) => {
 					req.session.email = req.body.email;
 					res.redirect('/admin');
 				} else {
-					res.render('admin-login', {layout : 'blank', error : "Wrong email or password"});
+					res.render('admin-login.twig', {layout : 'blank', error : "Wrong email or password"});
 				}
 			});
 		} else {
-			res.render('admin-login', {layout : 'blank', error : 'Fill all inputs.'});
+			res.render('admin-login.twig', {layout : 'blank', error : 'Fill all inputs.'});
 		}
 	});
 
@@ -91,11 +91,11 @@ module.exports = (app) => {
 						for (var i = 0; i < documents.length; i++) {
 							data.col.push(documents[i].toJSON());
 						}
-						res.render('show-data', data);
+						res.render('show-data.twig', data);
 					});
 				} else {
 					data.error = 'Collection ' + req.params.col + ' not found.';
-					res.render('show-data', data);
+					res.render('show-data.twig', data);
 				}
 			}
 		}

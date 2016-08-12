@@ -14,7 +14,7 @@ module.exports = (app) => {
 		}
 
 		app.get('*', (req, res) => {
-			res.render('404', {layout : 'blank'});
+			res.render('404.twig', {layout : 'blank'});
 		});
 
 	});

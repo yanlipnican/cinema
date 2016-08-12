@@ -1,0 +1,24 @@
+{% extends "base-layout.twig" %}
+
+{% block content %}
+    <div class="row">
+		<div class="col-md-8">
+			<h2>Posts</h2>
+			{% for post in posts %}
+			    <div class="item col-sm-12 well">
+				    <h3>{{ post.title }}</h3>
+					<p>{{ post.text }}</p>
+				</div>
+			{% else %}
+			    No posts have been found.
+			{% endfor %}
+
+		</div>
+		<div class="col-md-4 sidebar">
+			<h2>Sidebar</h2>
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum maiores, omnis et repudiandae fugit rerum excepturi sit quaerat non quibusdam ipsam provident assumenda quo distinctio magni inventore laboriosam! Et, laboriosam.
+			</p>		
+		</div>
+	</div>
+{% endblock %}
