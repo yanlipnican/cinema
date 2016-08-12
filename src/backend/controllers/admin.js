@@ -12,12 +12,13 @@ module.exports = (app) => {
 
 	app.get('/admin', (req, res) => {
 
-		const data = {
-			layout : 'admin',
-			cols : []
-		}
-
 		if(req.session.email){
+
+			const data = {
+				layout : 'admin',
+				cols : []
+			};
+
 			for(let key in models){
 				if(models[key].access) data.cols.push(models[key]._name);
 			}
@@ -58,19 +59,19 @@ module.exports = (app) => {
 
 	app.post('/admin/get-collection-list', (req, res) =>{
 		
-		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+		if(helper.isUndefined(req.session.email))res.redirect('/admin/login');
+		else {
+			const data = { cols : []};
 
-		const data = { cols : []};
+			for (let key in models) {
 
-		for (let key in models) {
-
-			if(models[key].access){
-				data.cols.push(models[key]._name);
+				if(models[key].access){
+					data.cols.push(models[key]._name);
+				}
 			}
-		}
 
-		res.json(data);
-	
+			res.json(data);
+		}	
 	});
 
 	app.get('/admin/show-data/:col/:page?', (req, res) => {
@@ -100,6 +101,84 @@ module.exports = (app) => {
 			}
 		}
 
+	});
+
+	app.post('/admin/delete-data/:col/:id', (req, res) => {
+
+		if(helper.isUndefined(req.session.email)) res.json(false);
+		else {
+			if(helper.isUndefined(req.params.col) && helper.isUndefined(req.params.id)) res.json({error : 'Undefined collection or id.'});
+			else {
+				models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
+					if(helper.isUndefined(document)) res.json({error : `${req.params.col} not found.`});
+					else {
+						document.remove();
+						res.json({success : `${req.params.col} has been removed.`});
+					}
+				});
+			}
+
+		}
+
+	});
+
+	app.get('/admin/add-data/:col', (req, res) => {
+		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+		else {
+			if(helper.isUndefined(req.params.col)) res.redirect('/admin');
+			else {
+
+				const data = {
+					title: `Add ${req.params.col}`,
+					structure: [],
+					colName: req.params.col
+				}
+
+				for(let key in models[req.params.col].schema.tree){
+					if(models[req.params.col].schema.tree[key].name === "String"){
+						data.structure.push(key);
+					}
+				}
+
+				res.render('admin-add-data.twig', data);
+
+			}
+		}
+	});
+
+	app.post('/admin/add-data/:col', (req, res) => {
+		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+		else {
+			if(helper.isUndefined(req.params.col)) res.json({error: 'Collection doesnt exist'});
+			else {
+
+				/*
+				let allFilled = true;
+
+				for(let key in models[req.params.col].schema.tree){
+					if(models[req.params.col].schema.tree[key].name === "String"){
+						allow = !helper.isEmpty(req.body[key]);
+						break;
+					}
+				}
+
+				if(allFilled){
+
+				}
+				*/
+
+				const documentData = {};
+
+				for(let key in req.body){
+					documentData[key] = req.body[key] || "";
+				}
+
+				const document = new models[req.params.col](documentData);
+				document.save();
+
+				res.json({success : `${req.params.col} has been added`});
+			}
+		}
 	});
 
 };

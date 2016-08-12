@@ -2,7 +2,7 @@
 
 {% block content %}
 	    
-	<div class="container">
+	<div class="container show-data">
 		<div class="row">
 			<div class="col-sm-12">
 
@@ -11,9 +11,9 @@
 						<strong>Error!</strong> {{ error }}
 					</div>
 				{% else %}
-					
+
 					<h2>{{ title }}</h2>
-					<a href="/admin/add-new-data/{{ colName }}">Add new</a>
+					<a href="/admin/add-data/{{ colName }}">Add new</a>
 
 					<table class="table">
 					    <thead>
@@ -31,9 +31,9 @@
 									<td>{{ doc.date }}</td>
 									<td>{{ doc.author }}</td>
 									<td>
-										<a href="/admin/edit-data/{{ colName }}/{{doc._id}}">Edit</a>
+										<a class="edit" href="/admin/edit-data/{{ colName }}/{{doc._id}}">Edit</a>
 										-
-										<a href="/admin/delete-data/{{ colName }}/{{doc._id}}">Delete</a>
+										<a class="remove" href="/admin/delete-data/{{ colName }}/{{doc._id}}">Delete</a>
 									</td>
 								</tr>
 							{% endfor %}

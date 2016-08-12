@@ -22,6 +22,7 @@ module.exports = (app) => {
 
 			if(!err) res.render('home.twig', data);
 			else res.render('500', {layout : 'blank'});
+			
 		});
 
 	});
