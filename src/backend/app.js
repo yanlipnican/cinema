@@ -6,7 +6,7 @@
 
 import express from 'express';
 import db from './dbConnection';
-import router from './router';
+import controllers from './controllers';
 import handlebars from 'express-handlebars';
 import session from 'express-session';
 import bodyParser from 'body-parser';
@@ -25,7 +25,7 @@ app.use(express.static('public'));
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({extended: true}));
 
-router(app);
+controllers(app);
 
 app.listen(PORT, () => {
 	console.log(`Listening on port ${PORT}!`);
