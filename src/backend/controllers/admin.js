@@ -4,15 +4,11 @@
 *	
 */
 
-import models from '../models';
-import helper from '../helpers';
-import hash from '../hash';
-
 module.exports = (app) => {
 
 	app.get('/admin', (req, res) => {
 
-		if(req.session.email){
+		if(req.session._id){
 
 			const data = {
 				layout : 'admin',
@@ -29,15 +25,15 @@ module.exports = (app) => {
 	});
 
 	app.get('/admin/login', (req, res) => {
-		if(req.session.email) res.redirect('/admin');
+		if(req.session._id) res.redirect('/admin');
 		else res.render('admin-login.twig', {layout : 'blank'});
 	});
 
 	app.post('/admin/login', (req, res) => {
-		if(!helper.isEmpty(req.body.email) && !helper.isEmpty(req.body.password)){
-			models.adminuser.find({email : req.body.email}, (err, users) =>{
-				if(users.length > 0 && users[0].password === hash.password(req.body.password, users[0].salt)){
-					req.session.email = req.body.email;
+		if(!helper.isEmpty(req.body.name) && !helper.isEmpty(req.body.password)){
+			models.adminuser.findOne({name : req.body.name}, (err, user) =>{
+				if(user !== null && user.password === hash.password(req.body.password, user.salt)){
+					req.session._id = user._id;
 					res.redirect('/admin');
 				} else {
 					res.render('admin-login.twig', {layout : 'blank', error : "Wrong email or password"});
@@ -59,7 +55,7 @@ module.exports = (app) => {
 
 	app.post('/admin/get-collection-list', (req, res) =>{
 		
-		if(helper.isUndefined(req.session.email))res.redirect('/admin/login');
+		if(helper.isUndefined(req.session._id))res.redirect('/admin/login');
 		else {
 			const data = { cols : []};
 
@@ -76,7 +72,7 @@ module.exports = (app) => {
 
 	app.get('/admin/show-data/:col/:page?', (req, res) => {
 
-		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
 			if(helper.isUndefined(req.params.col)) res.redirect('/admin');
 			else {
@@ -87,7 +83,7 @@ module.exports = (app) => {
 				}
 
 				if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
-					models[req.params.col].find().limit(15).exec((err, documents) => {
+					models[req.params.col].find().limit(15).sort({createdAt : -1}).exec((err, documents) => {
 						data.col = [];
 						for (var i = 0; i < documents.length; i++) {
 							data.col.push(documents[i].toJSON());
@@ -105,7 +101,7 @@ module.exports = (app) => {
 
 	app.post('/admin/delete-data/:col/:id', (req, res) => {
 
-		if(helper.isUndefined(req.session.email)) res.json(false);
+		if(helper.isUndefined(req.session._id)) res.json(false);
 		else {
 			if(helper.isUndefined(req.params.col) && helper.isUndefined(req.params.id)) res.json({error : 'Undefined collection or id.'});
 			else {
@@ -123,21 +119,15 @@ module.exports = (app) => {
 	});
 
 	app.get('/admin/add-data/:col', (req, res) => {
-		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
 			if(helper.isUndefined(req.params.col)) res.redirect('/admin');
 			else {
 
 				const data = {
 					title: `Add ${req.params.col}`,
-					structure: [],
+					structure: models[req.params.col].structure,
 					colName: req.params.col
-				}
-
-				for(let key in models[req.params.col].schema.tree){
-					if(models[req.params.col].schema.tree[key].name === "String"){
-						data.structure.push(key);
-					}
 				}
 
 				res.render('admin-add-data.twig', data);
@@ -147,7 +137,7 @@ module.exports = (app) => {
 	});
 
 	app.post('/admin/add-data/:col', (req, res) => {
-		if(helper.isUndefined(req.session.email)) res.redirect('/admin/login');
+		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
 			if(helper.isUndefined(req.params.col)) res.json({error: 'Collection doesnt exist'});
 			else {
@@ -173,10 +163,15 @@ module.exports = (app) => {
 					documentData[key] = req.body[key] || "";
 				}
 
-				const document = new models[req.params.col](documentData);
-				document.save();
+				models.adminuser.findOne({_id : req.session._id}, (err, author)=>{
+					if(author !== null){
+						documentData.author = author.name;
+						const document = new models[req.params.col](documentData);
+						document.save();
 
-				res.json({success : `${req.params.col} has been added`});
+						res.json({success : `${req.params.col} has been added`});
+					}
+				});
 			}
 		}
 	});

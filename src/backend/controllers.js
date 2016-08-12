@@ -1,10 +1,11 @@
 // router imports all pages from pages directory
 
 import glob from 'glob';
+import path from 'path';
 
 module.exports = (app) => {
 
-	glob(appRoot + "/controllers/*.js", (er, files) => {
+	glob(path.resolve(__dirname) + "/controllers/*.js", (er, files) => {
 		
 		for (var i = 0; i < files.length; i++) {
 			let controller = require(files[i]);

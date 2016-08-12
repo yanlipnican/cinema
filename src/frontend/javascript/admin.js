@@ -47,7 +47,7 @@ $(document).ready(() =>{
 
 		const data = {};
 
-		$('textarea').each(function(){
+		$('.data').each(function(){
 			data[$(this).attr('name')] = $(this).val();
 		})
 

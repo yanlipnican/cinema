@@ -5,22 +5,31 @@
 */
 
 import express from 'express';
-import db from './dbConnection';
-import controllers from './controllers';
+import mongoose from 'mongoose';
 import twig from 'twig';
 import session from 'express-session';
 import bodyParser from 'body-parser';
-import path from 'path';
+
+global.mongoose = mongoose;
+global.models = models;
+global.helper = helper;
+global.hash = hash;
+
+import db from './dbConnection';
+import controllers from './controllers';
+import twigHelpers from './twigHelpers';
+import models from './models';
+import helper from './helpers';
+import hash from './hash';
 
 const app = express();
 const PORT = 6969;
-
-global.appRoot = path.resolve(__dirname);
 
 
 // Only for devel, if cache is disabled you don't need to restart server
 // if you modify twig templates
 twig.cache(false);
+twigHelpers(twig);
 
 app.set('view engine', 'twig');
 app.set('views', './views')

@@ -4,10 +4,6 @@
 *	
 */
 
-import models from '../models';
-import helper from '../helpers';
-import hash from '../hash';
-
 module.exports = (app) => {
 	
 	app.get('/register', (req, res) => {

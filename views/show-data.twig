@@ -20,6 +20,7 @@
 					      <tr>
 							<th>Title</th>
 							<th>Date</th>
+							<th>Last update</th>
 							<th>Author</th>
 							<th>-</th>
 					      </tr>
@@ -28,7 +29,8 @@
 					      	{% for doc in col %}
 					      		<tr>
 									<td>{{ doc.title }}</td>
-									<td>{{ doc.date }}</td>
+									<td>{{ date(doc.createdAt) }}</td>
+									<td>{{ date(doc.updatedAt) }}</td>
 									<td>{{ doc.author }}</td>
 									<td>
 										<a class="edit" href="/admin/edit-data/{{ colName }}/{{doc._id}}">Edit</a>

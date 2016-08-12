@@ -7,8 +7,25 @@
 }
 
 .add-data{
-	textarea{
+	h2{
+		margin-bottom: 30px;
+	}
+	h4{margin-top: 0;}
+	.section{
+		margin-bottom: 20px;
+	}
+	textarea, input{
 		width:100%;
+		resize: vertical;
+		border:none;
+		background: #efefef;
+		padding: 10px 20px;
+		&:focus{
+			outline: 0;
+		}
+	}
+	textarea{
+		min-height: 200px;
 	}
 }
 

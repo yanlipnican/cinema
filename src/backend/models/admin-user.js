@@ -1,6 +1,3 @@
-import mongoose from 'mongoose';
-import hash from '../hash';
-
 const model = {
 
 	name : 'adminuser',
@@ -12,7 +9,7 @@ const model = {
 		email    : String,
 		password : String,
 		salt	 : String
-	})
+	},{timestamps : true})
 
 };
 

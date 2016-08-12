@@ -41,12 +41,11 @@ gulp.task('clean', function () {
 gulp.task('nodemon', function () {
     nodemon({ 
       script: 'app/app.js',
-        ext: 'html js less',
+        ext: 'js',
         ignore: [
             'app/',
             'node_modules/',
             'public/javascript/',
-            'public/styles/',
             'src/frontend/',
             'gulpfile.js'
           ],

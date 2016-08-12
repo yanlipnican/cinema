@@ -6,17 +6,21 @@
 			
 			<h2>{{ title }}</h2>
 			
-			{% for item in structure %}
+			{% for key, item in structure %}
+			<div class="row section">
 			    <div class="col-sm-2">
-			    	<h3>{{item}}</h3>
+			    	<h4>{{key}}</h4>
 			    </div>
 			    <div class="col-sm-10">
-			    	<textarea name="{{item}}" cols="30" rows="10"></textarea>
+				    {% if item == 'textarea'%}
+						<textarea class="data" name="{{key}}"></textarea>
+					{% elseif item == 'input' %}
+						<input class="data" type="text" name="{{key}}">
+				    {% endif %}
 			    </div>
+			</div>
 			{% endfor %}
-
-			<a id="add-new" href="/admin/add-data/{{ colName }}" class="btn .btn-primary">Add</a>
-
+			<a id="add-new" role="button" href="/admin/add-data/{{ colName }}" class="btn btn-primary">Publish</a>
 		</div>
 	</div>
 {% endblock %}

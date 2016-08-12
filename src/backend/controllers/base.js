@@ -4,8 +4,6 @@
 *	such as serving just pages
 */
 
-import models from '../models';
-
 module.exports = (app) => {
 	
 	/*
@@ -16,7 +14,7 @@ module.exports = (app) => {
 
 		const data = {title:'cinema'};
 
-		models.post.find((err, posts) => {
+		models.post.find().limit(8).sort({createdAt : -1}).exec((err, posts) => {
 			
 			data.posts = posts;
 
