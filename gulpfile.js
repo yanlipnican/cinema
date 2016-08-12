@@ -4,11 +4,17 @@ var less = require("gulp-less");
 var nodemon = require("gulp-nodemon");
 var clean = require("gulp-clean");
 var mergeStream = require("merge-stream");
+var watch = require("gulp-watch");
 
 gulp.task("es6-node", function () {
   return gulp.src("src/backend/**/*.js")
     .pipe(babel())
     .pipe(gulp.dest("app/"));
+});
+
+gulp.task('watch', function () {
+  gulp.watch('src/frontend/javascript/*.js', ['es6-frontend']);
+  gulp.watch('src/frontend/styles/*.less', ['less']);
 });
 
 gulp.task("es6-frontend", function(){
@@ -32,24 +38,30 @@ gulp.task('clean', function () {
     return mergeStream(tasks);
 });
 
-gulp.task('build', ['es6-node', 'less', 'es6-frontend']);
-
-gulp.task('devel', function () {
-  	nodemon({ 
-  		script: 'app/app.js',
+gulp.task('nodemon', function () {
+    nodemon({ 
+      script: 'app/app.js',
         ext: 'html twig js less',
         ignore: [
             'app/',
             'node_modules/',
             'public/javascript/',
-            'public/styles/'
-        	],
-        tasks: ['build'] 
+            'public/styles/',
+            'src/frontend/',
+            'gulpfile.js'
+          ],
+        tasks: ['build-backend'] 
       })
     .on('restart', function () {
       console.log('server restarted!');
     });
 });
+
+gulp.task('build', ['es6-node', 'less', 'es6-frontend']);
+
+gulp.task('build-backend', ['es6-node']);
+
+gulp.task('devel', ['nodemon', 'watch']);
 
 gulp.task('run', function(){
 	nodemon({script: 'app/app.js'});
