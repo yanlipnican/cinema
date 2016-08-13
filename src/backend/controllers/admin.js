@@ -19,7 +19,14 @@ const pagination = (req, data, limit) => {
 
 			data.currentPage = page + 1;
 
-			resolve(page);
+			models[req.params.col].find().limit(limit).skip(limit * page).sort({createdAt : -1}).exec((err, documents) => {
+				data.col = [];
+				for (var i = 0; i < documents.length; i++) {
+					data.col.push(documents[i].toJSON());
+				}
+
+				resolve();
+			});
 
 		});
 
@@ -118,16 +125,9 @@ module.exports = (app) => {
 		if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
 
 			pagination(req, data, limit)
-				.then((page) => {
+				.then(() => {
 
-					models[req.params.col].find().limit(limit).skip(limit * page).sort({createdAt : -1}).exec((err, documents) => {
-						data.col = [];
-						for (var i = 0; i < documents.length; i++) {
-							data.col.push(documents[i].toJSON());
-						}
-
-						res.render('show-data.twig', data);
-					});
+					res.render('show-data.twig', data);
 
 				});
 
