@@ -5,6 +5,28 @@
 */
 
 
+const pagination = (req, data, limit) => {
+	return new Promise((resolve) => {
+
+		models[req.params.col].count({}, (err, count) =>{
+
+			data.pageCount = Math.ceil(count / limit);
+
+			let page = req.params.page - 1 || 0;
+
+			if(page < 0) page = 0;
+			if(page >= data.pageCount) page = data.pageCount - 1;
+
+			data.currentPage = page + 1;
+
+			resolve(page);
+
+		});
+
+	});
+}
+
+
 // base data and operations we need every time we get admin page
 const get = (app, route, callback) => {
 	app.get(route, (req, res) => {
@@ -88,17 +110,27 @@ module.exports = (app) => {
 
 	get(app, '/admin/show-data/:col/:page?', (req, res, data) => {
 
-		data.title = `Show - ${req.params.col}`,
-		data.colName = req.params.col 
+		data.title = `Show - ${req.params.col}`;
+		data.colName = req.params.col;
+
+		const limit = 2;
 
 		if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
-			models[req.params.col].find().limit(15).sort({createdAt : -1}).exec((err, documents) => {
-				data.col = [];
-				for (var i = 0; i < documents.length; i++) {
-					data.col.push(documents[i].toJSON());
-				}
-				res.render('show-data.twig', data);
-			});
+
+			pagination(req, data, limit)
+				.then((page) => {
+
+					models[req.params.col].find().limit(limit).skip(limit * page).sort({createdAt : -1}).exec((err, documents) => {
+						data.col = [];
+						for (var i = 0; i < documents.length; i++) {
+							data.col.push(documents[i].toJSON());
+						}
+
+						res.render('show-data.twig', data);
+					});
+
+				});
+
 		} else {
 			data.error = 'Collection ' + req.params.col + ' not found.';
 			res.render('show-data.twig', data);

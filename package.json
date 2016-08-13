@@ -24,6 +24,7 @@
     "merge-stream": "^1.0.0",
     "mongodb": "^2.2.5",
     "mongoose": "^4.5.8",
+    "serve-favicon": "^2.3.0",
     "twig": "^0.9.5"
   }
 }

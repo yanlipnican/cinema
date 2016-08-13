@@ -12,12 +12,12 @@
 			    	<h4>{{key}}</h4>
 			    </div>
 			    <div class="col-sm-10">
-				    {% if item == 'textarea'%}
-						<div class="data summernote" name="{{key}}"></div>
+				    {% if item == 'wysiwyg'%}
+						<div class="data summernote {{ key }}" name="{{key}}"></div>
 					{% elseif item == 'input' %}
-						<input class="data" type="text" name="{{key}}">
-					{% elseif structure[key] == 'textarea' %}
-						<textarea name="{{key}}" class="data"></textarea>
+						<input class="data {{ key }}" type="text" name="{{key}}">
+					{% elseif item == 'textarea' %}
+						<textarea name="{{key}}" class="data {{ key }}"></textarea>
 				    {% endif %}
 			    </div>
 			</div>

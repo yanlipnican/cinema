@@ -16,7 +16,11 @@ module.exports = (app) => {
 
 		models.post.find().limit(8).sort({createdAt : -1}).exec((err, posts) => {
 			
-			data.posts = posts;
+			data.posts = [];
+
+			for (var i = 0; i < posts.length; i++) {
+				data.posts.push(posts[i].toJSON());
+			}
 
 			if(!err) res.render('home.twig', data);
 			else res.render('500', {layout : 'blank'});

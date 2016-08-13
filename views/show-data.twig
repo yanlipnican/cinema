@@ -45,6 +45,15 @@
 				{% endif %}
 
 			</div>
+			<div class="paginationContainer col-sm-12">
+			<ul class="pagination">
+			{% if pageCount > 1 %}
+				{% for i in 1..pageCount %}
+					<li {% if i == currentPage %} class="active"  {% endif %}><a href="/admin/show-data/{{ colName }}/{{ i }}">{{ i }}</a></li>
+				{% endfor %}
+			{% endif %}
+			</ul>
+			</div>
 		</div>
 	</div>
 

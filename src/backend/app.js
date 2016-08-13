@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import twig from 'twig';
 import session from 'express-session';
 import bodyParser from 'body-parser';
+import favicon from 'serve-favicon';
 
 import db from './dbConnection';
 import controllers from './controllers';
