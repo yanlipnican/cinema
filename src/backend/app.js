@@ -10,17 +10,18 @@ import twig from 'twig';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 
-global.mongoose = mongoose;
-global.models = models;
-global.helper = helper;
-global.hash = hash;
-
 import db from './dbConnection';
 import controllers from './controllers';
 import twigHelpers from './twigHelpers';
 import models from './models';
 import helper from './helpers';
 import hash from './hash';
+
+
+global.mongoose = mongoose;
+global.models = models;
+global.helper = helper;
+global.hash = hash;
 
 const app = express();
 const PORT = 6969;

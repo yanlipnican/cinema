@@ -5,6 +5,7 @@
 */
 
 
+// base data and operations we need every time we get admin page
 const get = (app, route, callback) => {
 	app.get(route, (req, res) => {
 		if(req.session._id){
@@ -16,6 +17,12 @@ const get = (app, route, callback) => {
 						name : admin.name
 					}
 				};
+
+				data.cols = [];
+
+				for(let key in models){
+					if(models[key].access) data.cols.push(models[key]._name);
+				}
 
 				callback(req, res, data);
 
@@ -30,19 +37,12 @@ module.exports = (app) => {
 
 
 	get(app, '/admin', (req, res, data) => {
-
-		data.cols = [];
-
-		for(let key in models){
-			if(models[key].access) data.cols.push(models[key]._name);
-		}
 		res.render('admin-hp.twig', data);
-
 	});
 
 	app.get('/admin/login', (req, res) => {
 		if(req.session._id) res.redirect('/admin');
-		else res.render('admin-login.twig', {layout : 'blank'});
+		else res.render('admin-login.twig');
 	});
 
 	app.post('/admin/login', (req, res) => {
@@ -52,11 +52,11 @@ module.exports = (app) => {
 					req.session._id = user._id;
 					res.redirect('/admin');
 				} else {
-					res.render('admin-login.twig', {layout : 'blank', error : "Wrong email or password"});
+					res.render('admin-login.twig', { error : "Wrong email or password"});
 				}
 			});
 		} else {
-			res.render('admin-login.twig', {layout : 'blank', error : 'Fill all inputs.'});
+			res.render('admin-login.twig', {error : 'Fill all inputs.'});
 		}
 	});
 
@@ -118,7 +118,7 @@ module.exports = (app) => {
 					res.render('show-document.twig', data);
 				} else {
 
-					data.title = `Edit ${req.params.col}`;
+					data.title = `Edit - ${req.params.col}`;
 					data.structure = models[req.params.col].structure;
 					data.document = document.toJSON();
 					data.colName = req.params.col;
@@ -192,6 +192,7 @@ module.exports = (app) => {
 		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
 			if(!helper.isUndefined(models[req.params.col])){
+
 				const documentData = {};
 
 				for(let key in req.body){
@@ -201,6 +202,7 @@ module.exports = (app) => {
 				}
 
 				models.adminuser.findOne({_id : req.session._id}, (err, author)=>{
+					
 					if(author !== null){
 						documentData.author = author.name;
 						const document = new models[req.params.col](documentData);
@@ -208,6 +210,7 @@ module.exports = (app) => {
 
 						res.json({success : `${req.params.col} has been added`});
 					}
+
 				});
 			}
 		}

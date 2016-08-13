@@ -9,10 +9,15 @@
 	<link rel="stylesheet" href="/styles/main.css">
 	<script src="/javascript/main.js"></script>
 	<script src="/javascript/admin.js"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+	<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+
 	<title>{{ title }}</title>
 </head>
 <body>
-	<header>
+	<header class="admin">
 		<nav class="navbar navbar-default">
 		  <div class="container-fluid col-sm-10">
 		    <div class="navbar-header">
@@ -20,6 +25,15 @@
 		    </div>
 		    <ul class="nav navbar-nav">
 		      <li><a href="/admin">Dashboard</a></li>
+		      <li class="dropdown">
+				  <a data-toggle="dropdown">Edit content
+				  <span class="caret"></span></a>
+				  <ul class="dropdown-menu">
+				    {% for col in cols %}
+				      <li><a href="/admin/show-data/{{ col }}">{{ col }}</a></li>
+				    {% endfor %}
+				  </ul>
+		      </li>
 		    </ul>
 		  </div>
 		  <div class="col-sm-2">

@@ -13,9 +13,11 @@
 			    </div>
 			    <div class="col-sm-10">
 				    {% if item == 'textarea'%}
-						<textarea class="data" name="{{key}}"></textarea>
+						<div class="data summernote" name="{{key}}"></div>
 					{% elseif item == 'input' %}
 						<input class="data" type="text" name="{{key}}">
+					{% elseif structure[key] == 'textarea' %}
+						<textarea name="{{key}}" class="data"></textarea>
 				    {% endif %}
 			    </div>
 			</div>

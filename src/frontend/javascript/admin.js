@@ -48,8 +48,14 @@ $(document).ready(() =>{
 		const data = {};
 
 		$('.data').each(function(){
-			data[$(this).attr('name')] = $(this).val();
-		})
+			
+			if($(this).hasClass('summernote')){
+				data[$(this).attr('name')] = $(this).summernote('code');
+			} else {
+				data[$(this).attr('name')] = $(this).val();
+			}
+
+		});
 
 		$.ajax({
 			url : address,
@@ -82,10 +88,14 @@ $(document).ready(() =>{
 		const data = {};
 
 		$('.data').each(function(){
-			data[$(this).attr('name')] = $(this).val();
-		});
+			
+			if($(this).hasClass('summernote')){
+				data[$(this).attr('name')] = $(this).summernote('code');
+			} else {
+				data[$(this).attr('name')] = $(this).val();
+			}
 
-		console.log(data);
+		});
 
 		$.ajax({
 			url : address,
@@ -104,6 +114,17 @@ $(document).ready(() =>{
 		});
 
 		e.preventDefault();
+
+	});
+
+	$('.add-data').ready(function(){
+
+		$(document).ready(function() {
+		  $('.summernote').summernote({
+		  	height: 300
+		  });
+		});
+
 
 	});
 

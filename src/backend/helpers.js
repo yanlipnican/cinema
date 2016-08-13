@@ -11,8 +11,8 @@ module.exports = {
 	},
 
 	isUndefined : (val) => {
-			if(typeof val === "undefined") return true;
-			else return false;
-		}
+		if(typeof val === "undefined") return true;
+		else return false;
+	}
 	
 }

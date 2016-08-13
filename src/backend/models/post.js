@@ -8,11 +8,11 @@ const model = {
 		author : {type : String, default : 'System'}
 	}, {timestamps: true} ),
 
-	// structure for cms to determine which element should use for
+	// structure for cms to determine which element should be used for
 	// property of model
 	structure : {
 		title : 'input',
-		text : 'textarea'
+		text : 'wysiwyg'
 	}
 
 };
