@@ -1,0 +1,12 @@
+{
+	"projectName" : "",
+	
+	"db" : {
+		"host" 	   : "localhost",
+		"name"   : "",
+		"username" : "",
+		"password" : "",
+		"port"     : 27017
+	}
+
+}

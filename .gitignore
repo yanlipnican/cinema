@@ -3,3 +3,6 @@ node_modules/
 app/
 public/javascript/
 public/styles/
+public/upload/
+var/
+cms-config.json

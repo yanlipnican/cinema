@@ -17,6 +17,7 @@
 	<title>{{ title }}</title>
 </head>
 <body>
+<div class="wraper">
 	<header class="admin">
 		<nav class="navbar navbar-default">
 		  <div class="container-fluid col-sm-10">
@@ -30,7 +31,7 @@
 				  <span class="caret"></span></a>
 				  <ul class="dropdown-menu">
 				    {% for col in cols %}
-				      <li><a href="/admin/show-data/{{ col }}">{{ col }}</a></li>
+				      <li><a href="/admin/show-data/{{ col }}">{{ col }}s</a></li>
 				    {% endfor %}
 				  </ul>
 		      </li>
@@ -45,15 +46,18 @@
 		  </div>
 		</nav>
 	</header>
+	<div class="content">
 		{% block content %}
 
 		{% endblock %}
+	</div>
 	<footer class="row">
-		<div class="col-sm-12">
+		<div class="inner col-sm-12">
 			<p>
 				Copyright &copy; 2016
 			</p>
 		</div>
 	</footer>
+</div>
 </body>
 </html>

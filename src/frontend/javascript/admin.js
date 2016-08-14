@@ -63,7 +63,7 @@ $(document).ready(() =>{
 			data
 		}).done(function(response){
 			if(response.error){
-				alert(data.error);
+				alert(response.error);
 			} else {
 				alert(response.success);
 				let showDataAddr = '/admin/show-data/' + address.split('/').pop();
@@ -103,7 +103,7 @@ $(document).ready(() =>{
 			data
 		}).done(function(response){
 			if(response.error){
-				alert(data.error);
+				alert(response.error);
 			} else {
 				alert(response.success);
 				let showDataAddr = '/admin/show-data/' + address.split('/')[3];

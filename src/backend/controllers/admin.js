@@ -98,26 +98,9 @@ module.exports = (app) => {
 		req.session.destroy();
 	});
 
-	app.post('/admin/get-collection-list', (req, res) =>{
-		
-		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
-		else {
-			const data = { cols : []};
-
-			for (let key in models) {
-
-				if(models[key].access){
-					data.cols.push(models[key]._name);
-				}
-			}
-
-			res.json(data);
-		}	
-	});
-
 	get(app, '/admin/show-data/:col/:page?', (req, res, data) => {
 
-		data.title = `Show - ${req.params.col}`;
+		data.title = `Show - ${req.params.col}s`;
 		data.colName = req.params.col;
 
 		const limit = 2;
@@ -175,11 +158,22 @@ module.exports = (app) => {
 					}
 				}
 
+				data.url = data.url.trim();
+
+				if(data.url !== ""){
+					data.url = data.url.toLowerCase().replace(/ /g, '-');
+				} else {
+					res.json({error : 'set url'});
+					return;
+				}
+
+				console.log(data.url);
+
 				models[req.params.col].findOne({_id : req.params.id}, (err, doc) => {
 					if(doc !== null){
 						for(let key in req.body){
 							if(!helper.isUndefined(models[req.params.col].structure[key])){
-								doc[key] = req.body[key] || "";
+								doc[key] = data[key];
 							}
 						}
 						doc.save();
@@ -220,6 +214,40 @@ module.exports = (app) => {
 
 	});
 
+
+	app.get('/admin/test', (req, res) => {
+		res.render('test-upload.twig');
+	});
+
+	app.post('/admin/test', (req, res) => {
+		
+		console.log(req.body);
+		console.log(req.files);
+
+		var source = fs.createReadStream(req.files.fileToUpload.file);
+		var dest = fs.createWriteStream(appRoot + '/public/upload/images/' + req.files.fileToUpload.filename);
+
+		source.pipe(dest);
+		source.on('end', function() { 
+
+			fs.unlink(req.files.fileToUpload.file, () => {
+				let fileDir = req.files.fileToUpload.file.split('/');
+				fileDir.pop();
+				fileDir = fileDir.join('/');
+				fs.rmdir(fileDir, function(){
+					fileDir = fileDir.split('/');
+					fileDir.pop();
+					fileDir = fileDir.join('/');
+					fs.rmdir(fileDir)
+				});
+			});
+			res.redirect('/admin/test');
+
+		});
+		source.on('error', function(err) { res.status(500).send('Damn no !') });
+
+	});
+
 	app.post('/admin/add-data/:col', (req, res) => {
 		if(helper.isUndefined(req.session._id)) res.redirect('/admin/login');
 		else {
@@ -231,6 +259,15 @@ module.exports = (app) => {
 					if(!helper.isUndefined(models[req.params.col].structure[key])){
 						documentData[key] = req.body[key] || "";
 					}
+				}
+
+				documentData.url = documentData.url.trim();
+
+				if(documentData.url !== ""){
+					documentData = documentData.toLowerCase().replace(/ /g, '-');
+				} else {
+					res.json({error : `set url`});
+					return;
 				}
 
 				models.adminuser.findOne({_id : req.session._id}, (err, author)=>{
