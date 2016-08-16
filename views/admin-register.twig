@@ -1,0 +1,41 @@
+{% extends 'blank-layout.twig' %}
+
+{% block content %}
+    
+	<div class="admin-login row">
+		
+		<h2 class="col-sm-12">Register - Admin</h2>
+
+		<form role="form" action="/admin/register" method="POST">
+
+		{% if error %}
+			<div class="alert alert-danger col-sm-12">
+				<strong>Error!</strong> {{ error }}
+			</div>
+		{% endif %}
+		<div class="form-group col-sm-12">
+			<p>This project has no admin yet, make one.</p>
+		    <label for="email">User name:</label>
+		    <input type="name" name="name" value="admin" class="form-control" id="name">
+		</div>
+
+		  <div class="form-group col-sm-12">
+		    <label for="email">Email address:</label>
+		    <input type="email" name="email" class="form-control" id="email">
+		  </div>
+		  <div class="form-group col-sm-6">
+		    <label for="pwd">Password:</label>
+		    <input type="password" name="password" class="form-control" id="pwd">
+		  </div>
+		  <div class="form-group col-sm-6">
+		    <label for="pwd">Repeat password:</label>
+		    <input type="password" name="repeatPassword" class="form-control" id="pwd">
+		  </div>
+		  <div class="col-sm-12">
+		  	<button type="submit" class="btn btn-primary">Sign up</button>
+		  </div>
+
+		</form>
+	</div>
+
+{% endblock %}

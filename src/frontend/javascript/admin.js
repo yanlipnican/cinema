@@ -125,6 +125,52 @@ $(document).ready(() =>{
 		  });
 		});
 
+	});
+
+	$('#change-password').submit(function(e){
+
+		const address = '/admin/change-password';
+
+		const data = {};
+
+		let valid = true;
+
+		$('.data').each(function(){
+			console.log($(this).val());
+			if($(this).val() !== ""){
+				data[$(this).attr('name')] = $(this).val();
+			} else {
+				valid = false;
+			}
+		});
+
+		if(!valid){
+			alert('Fill all fields.');
+			return false;
+		}
+
+
+		if(data.newPass !== data.newPassRepeat){
+			alert('Repeat password correctly');
+			return false;
+		}
+
+		$.ajax({
+			url : address,
+			method : 'POST',
+			data
+		}).done((response) => {
+			if(response.error){
+				alert(response.error);
+			} else {
+				alert(response.success);
+				window.location = "/admin";
+			}
+		}).fail((err) => {
+			alert('Something went wrong :' + err);
+		});
+
+		e.preventDefault();
 
 	});
 

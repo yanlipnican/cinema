@@ -6,7 +6,7 @@
 
 
 const pagination = (req, data, limit) => {
-	return new Promise((resolve) => {
+	return new Promise( resolve => {
 
 		models[req.params.col].count({}, (err, count) =>{
 
@@ -70,8 +70,50 @@ module.exports = (app) => {
 	});
 
 	app.get('/admin/login', (req, res) => {
-		if(req.session._id) res.redirect('/admin');
-		else res.render('admin-login.twig');
+		
+		if(req.session._id) {
+			res.redirect('/admin');
+			return false;
+		}
+
+		models.adminuser.count((err, count) => {
+			
+			if(count == 0){
+				res.render('admin-register.twig');
+				return false;
+			}
+
+			res.render('admin-login.twig');
+		
+		});
+
+	});
+
+	app.post('/admin/register', (req, res) => {
+		
+		if(helper.isEmpty(req.body.name) || helper.isEmpty(req.body.email) || helper.isEmpty(req.body.repeatPassword) || helper.isEmpty(req.body.password)){
+			res.render('admin-register.twig', {error : 'Fill all inputs.'});
+			return false;
+		}
+		
+		if(req.body.password !== req.body.repeatPassword){
+			res.render('admin-register.twig', {error : 'You didnt correctly repeated password.'});
+			return false;
+		}
+
+		let newAdmin = new models.adminuser({ name : req.body.name, email : req.body.email.toLowerCase().replace(/ /g, '')});
+		
+		let created = newAdmin.createPassword(req.body.password);
+
+		if(created !== true){
+			res.render('admin-register.twig', created);
+			return false;
+		}
+
+		newAdmin.save();
+
+		res.redirect('/admin/login');
+
 	});
 
 	app.post('/admin/login', (req, res) => {
@@ -216,6 +258,7 @@ module.exports = (app) => {
 
 
 	app.get('/admin/test', (req, res) => {
+		data.title = "Password change";
 		res.render('test-upload.twig');
 	});
 
@@ -244,7 +287,7 @@ module.exports = (app) => {
 			res.redirect('/admin/test');
 
 		});
-		source.on('error', function(err) { res.status(500).send('Damn no !') });
+		source.on('error', err => { res.status(500).send('Damn no ! ' + err) });
 
 	});
 
@@ -264,7 +307,7 @@ module.exports = (app) => {
 				documentData.url = documentData.url.trim();
 
 				if(documentData.url !== ""){
-					documentData = documentData.toLowerCase().replace(/ /g, '-');
+					documentData.url = documentData.url.toLowerCase().replace(/ /g, '-');
 				} else {
 					res.json({error : `set url`});
 					return;
@@ -283,6 +326,38 @@ module.exports = (app) => {
 				});
 			}
 		}
+	});
+
+	get(app, '/admin/change-password', (req, res, data) => {
+		res.render('admin-change-password.twig', data);
+	});
+
+	app.post('/admin/change-password', (req, res) => {
+
+		if(helper.isUndefined(req.session._id)) {
+			res.redirect('/admin/login');
+			return false;
+		}
+
+		if(req.body.newPass !== req.body.newPassRepeat){
+			res.json({error : 'Repeat password correctly'});
+			return false;
+		}
+
+		models.adminuser.findOne({_id : req.session._id}, (err, admin) => {
+			
+			let changed = admin.changePassword(req.body.oldPass, req.body.newPass);
+			
+			if(changed !== true){
+				res.json(changed);
+				return false;
+			}
+
+			admin.save();
+			res.json({success : 'Password has been changed'});
+
+		});
+
 	});
 
 };

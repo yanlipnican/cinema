@@ -66,5 +66,10 @@ gulp.task('run', function(){
 	nodemon({script: 'app/app.js'});
 });
 
-gulp.task('default', ['run']);
+gulp.task('default', function(){
+  console.log('available tasks :');
+  console.log('- build');
+  console.log('- devel');
+  console.log('- run');
+});
 
