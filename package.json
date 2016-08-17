@@ -4,7 +4,8 @@
   "description": "Cinema web and backend solution",
   "main": "src/app.js",
   "scripts": {
-    "run": "node app/app.js"
+    "start": "node app",
+    "postinstall": "gulp build"
   },
   "author": "Jan Lipnican <yanlipnican@gmail.com>",
   "license": "MIT",
