@@ -2,7 +2,7 @@
   "name": "cinema",
   "version": "0.0.1",
   "description": "Cinema web and backend solution",
-  "main": "src/app.js",
+  "main": "app/app.js",
   "scripts": {
     "start": "node app/app.js",
     "postinstall": "gulp build"
