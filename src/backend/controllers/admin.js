@@ -95,14 +95,17 @@ module.exports = (app) => {
 
 	app.post('/admin/register', (req, res) => {
 		
-		if(
-			helper.isEmpty(req.body.name) || 
-			helper.isEmpty(req.body.email) || 
-			helper.isEmpty(req.body.repeatPassword) || 
-			helper.isEmpty(req.body.password
-		)){
+		const valid = helper.validate(req, {
+			password : 'empty',
+			repeatPassword : 'empty',
+			email : 'empty',
+			name : 'empty',	
+			email : 'email'		
+		});
 
-			res.render('admin-register.twig', {error : 'Fill all inputs.'});
+		if(valid !== true){
+
+			res.render('admin-register.twig', valid);
 			return false;
 
 		}
@@ -112,12 +115,15 @@ module.exports = (app) => {
 			return false;
 		}
 
-		let newAdmin = new models.adminuser({ name : req.body.name, email : req.body.email.toLowerCase().replace(/ /g, '')});
-		
-		let created = newAdmin.createPassword(req.body.password);
 
-		if(created !== true){
-			res.render('admin-register.twig', created);
+		let email = req.body.email.toLowerCase().replace(/ /g, '');
+
+		let newAdmin = new models.adminuser({ name : req.body.name, email});
+
+		let createdPass = newAdmin.createPassword(req.body.password);
+
+		if(createdPass !== true){
+			res.render('admin-register.twig', createdPass);
 			return false;
 		}
 
@@ -128,18 +134,25 @@ module.exports = (app) => {
 	});
 
 	app.post('/admin/login', (req, res) => {
-		if(!helper.isEmpty(req.body.name) && !helper.isEmpty(req.body.password)){
-			models.adminuser.findOne({name : req.body.name}, (err, user) =>{
-				if(user !== null && user.password === hash.password(req.body.password, user.salt)){
-					req.session._id = user._id;
-					res.redirect('/admin');
-				} else {
-					res.render('admin-login.twig', { error : "Wrong email or password"});
-				}
-			});
-		} else {
-			res.render('admin-login.twig', {error : 'Fill all inputs.'});
+		
+		const valid = helper.validate(req, {
+			name : 'empty',
+			password : 'empty'
+		});
+
+		if(valid !== true){
+			res.render('admin-login.twig', valid);
+			return false;
 		}
+
+		models.adminuser.findOne({name : req.body.name}, (err, user) =>{
+			if(user !== null && user.password === hash.password(req.body.password, user.salt)){
+				req.session._id = user._id;
+				res.redirect('/admin');
+			} else {
+				res.render('admin-login.twig', { error : "Wrong email or password"});
+			}
+		});
 	});
 
 	app.get('/admin/logout', (req, res) => {
@@ -338,6 +351,17 @@ module.exports = (app) => {
 	});
 
 	app.post('/admin/change-password', (req, res) => {
+
+		const valid = helper.validate(req, {
+			oldPass : 'empty',
+			newPass : 'empty',
+			newPassRepeat : 'empty'
+		})
+
+		if(valid !== true){
+			res.json(valid);
+			return false;
+		}
 
 		if(req.body.newPass !== req.body.newPassRepeat){
 			res.json({error : 'Repeat password correctly'});
