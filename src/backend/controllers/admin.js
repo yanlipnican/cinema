@@ -218,7 +218,7 @@ module.exports = (app) => {
 
 				const data = {};
 
-				for(let key in req.body){
+				for(let key in models[req.params.col].structure){
 					if(!helper.isUndefined(models[req.params.col].structure[key])){
 						data[key] = req.body[key] || "";
 					}
@@ -317,7 +317,7 @@ module.exports = (app) => {
 
 			const documentData = {};
 
-			for(let key in req.body){
+			for(let key in models[req.params.col].structure){
 				if(!helper.isUndefined(models[req.params.col].structure[key])){
 					documentData[key] = req.body[key] || "";
 				}
