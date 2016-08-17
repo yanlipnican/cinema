@@ -4,7 +4,7 @@
   "description": "Cinema web and backend solution",
   "main": "src/app.js",
   "scripts": {
-    "start": "node app",
+    "start": "node app/app.js",
     "postinstall": "gulp build"
   },
   "author": "Jan Lipnican <yanlipnican@gmail.com>",
