@@ -6,3 +6,4 @@ public/styles/
 public/upload/
 var/
 cms-config.json
+*.log

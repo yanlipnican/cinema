@@ -42,9 +42,9 @@ module.exports = {
 
 			} else if(rules[key] === 'email'){
 
-				if(this.validateEmail(req.body[key])){
+				if(!this.validateEmail(req.body[key])){
 
-					return this.error(this.message.email);
+					return this.error(this.messages.email);
 
 				}
 
@@ -52,7 +52,7 @@ module.exports = {
 
 				if(this.isUndefined(req.body[key])){
 
-					return this.error(this.message.input);
+					return this.error(this.messages.input);
 
 				}
 

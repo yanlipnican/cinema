@@ -63,7 +63,7 @@ module.exports = (app) => {
 
 	// midleware controll session
 	app.use('/admin', (req,res,next) => {
-		if(req.session._id || req._parsedUrl.path === "/admin/login") next();
+		if(req.session._id || req._parsedUrl.path === "/admin/login" || req._parsedUrl.path === "/admin/register") next();
 		else {
 			res.redirect('/admin/login');
 		}
@@ -94,42 +94,50 @@ module.exports = (app) => {
 	});
 
 	app.post('/admin/register', (req, res) => {
+
+		models.adminuser.count((err, count) => {
+			
+			if(count == 0){
+
+				const valid = helper.validate(req, {
+					password : 'empty',
+					repeatPassword : 'empty',
+					email : 'empty',
+					name : 'empty',	
+					email : 'email'		
+				});
+
+				if(valid !== true){
+
+					res.render('admin-register.twig', valid);
+					return false;
+
+				}
+				
+				if(req.body.password !== req.body.repeatPassword){
+					res.render('admin-register.twig', {error : 'You didnt correctly repeated password.'});
+					return false;
+				}
+
+
+				let email = req.body.email.toLowerCase().replace(/ /g, '');
+
+				let newAdmin = new models.adminuser({ name : req.body.name, email});
+
+				let createdPass = newAdmin.createPassword(req.body.password);
+
+				if(createdPass !== true){
+					res.render('admin-register.twig', createdPass);
+					return false;
+				}
+
+				newAdmin.save();
+
+				res.redirect('/admin/login');
+			
+			} else res.redirect('/admin-login');
 		
-		const valid = helper.validate(req, {
-			password : 'empty',
-			repeatPassword : 'empty',
-			email : 'empty',
-			name : 'empty',	
-			email : 'email'		
 		});
-
-		if(valid !== true){
-
-			res.render('admin-register.twig', valid);
-			return false;
-
-		}
-		
-		if(req.body.password !== req.body.repeatPassword){
-			res.render('admin-register.twig', {error : 'You didnt correctly repeated password.'});
-			return false;
-		}
-
-
-		let email = req.body.email.toLowerCase().replace(/ /g, '');
-
-		let newAdmin = new models.adminuser({ name : req.body.name, email});
-
-		let createdPass = newAdmin.createPassword(req.body.password);
-
-		if(createdPass !== true){
-			res.render('admin-register.twig', createdPass);
-			return false;
-		}
-
-		newAdmin.save();
-
-		res.redirect('/admin/login');
 
 	});
 
@@ -166,24 +174,25 @@ module.exports = (app) => {
 
 	get(app, '/admin/show-data/:col/:page?', (req, res, data) => {
 
+		if(helper.isUndefined(models[req.params.col]) || !models[req.params.col].access){
+			data.error = 'Collection ' + req.params.col + ' not found.';
+			res.render('show-data.twig', data);
+			return false;
+		}
+
 		data.title = `Show - ${req.params.col}s`;
 		data.colName = req.params.col;
 
 		const limit = 2;
 
-		if(!helper.isUndefined(models[req.params.col]) && models[req.params.col].access){
+		pagination(req, data, limit)
+			.then(() => {
 
-			pagination(req, data, limit)
-				.then(() => {
+				res.render('show-data.twig', data);
 
-					res.render('show-data.twig', data);
+			});
 
-				});
-
-		} else {
-			data.error = 'Collection ' + req.params.col + ' not found.';
-			res.render('show-data.twig', data);
-		}
+		
 		
 	});
 
@@ -192,66 +201,86 @@ module.exports = (app) => {
 		if(helper.isUndefined(models[req.params.col])){
 			data.error = 'Collection ' + req.params.col + ' not found.';
 			res.render('show-data.twig', data);
-		} else {
-			models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
-				if(document === null){
-					data.error = 'Document with id ' + req.params.id + ' not found.';
-					res.render('show-document.twig', data);
-				} else {
-
-					data.title = `Edit - ${req.params.col}`;
-					data.structure = models[req.params.col].structure;
-					data.document = document.toJSON();
-					data.colName = req.params.col;
-
-					res.render('admin-edit-data.twig', data);
-				}
-			});
+			return false;
 		}
+
+		models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
+			if(document === null){
+				data.error = 'Document with id ' + req.params.id + ' not found.';
+				res.render('show-document.twig', data);
+			} else {
+
+				data.title = `Edit - ${req.params.col}`;
+				data.structure = models[req.params.col].structure;
+				data.document = document.toJSON();
+				data.colName = req.params.col;
+
+				res.render('admin-edit-data.twig', data);
+			}
+		});
+		
 
 	});
 
 	app.post('/admin/edit-data/:col/:id', (req, res) => {
 
-			if(helper.isUndefined(models[req.params.col])) res.json({error : `${req.params.col} not found.`});
-			else {
-
-				const data = {};
-
-				for(let key in models[req.params.col].structure){
-					if(!helper.isUndefined(models[req.params.col].structure[key])){
-						data[key] = req.body[key] || "";
-					}
-				}
-
-				data.url = data.url.trim();
-
-				if(data.url !== ""){
-					data.url = data.url.toLowerCase().replace(/ /g, '-');
-				} else {
-					res.json({error : 'set url'});
-					return;
-				}
-
-				console.log(data.url);
-
-				models[req.params.col].findOne({_id : req.params.id}, (err, doc) => {
-					if(doc !== null){
-						for(let key in req.body){
-							if(!helper.isUndefined(models[req.params.col].structure[key])){
-								doc[key] = data[key];
-							}
-						}
-						doc.save();
-						res.json({success : `${req.params.col} has been edited.`});
-					} else res.json({error : `${req.params.col} not found.`});
-				});
-
+			if(helper.isUndefined(models[req.params.col])){
+				res.json({error : `${req.params.col} not found.`});
+				return false;
 			}
+
+			if(!models[req.params.col].access) {
+				res.json(helper.error('You dont have access to this collection'));
+				return false;
+			}
+			
+
+			const data = {};
+
+			for(let key in models[req.params.col].structure){
+				if(!helper.isUndefined(models[req.params.col].structure[key])){
+					data[key] = req.body[key] || "";
+				}
+			}
+
+			data.url = data.url.trim();
+
+			if(data.url !== ""){
+				data.url = data.url.toLowerCase().replace(/ /g, '-');
+			} else {
+				res.json({error : 'set url'});
+				return;
+			}
+
+			console.log(data.url);
+
+			models[req.params.col].findOne({_id : req.params.id}, (err, doc) => {
+				if(doc !== null){
+					for(let key in req.body){
+						if(!helper.isUndefined(models[req.params.col].structure[key])){
+							doc[key] = data[key];
+						}
+					}
+					doc.save();
+					res.json({success : `${req.params.col} has been edited.`});
+				} else res.json({error : `${req.params.col} not found.`});
+			});
+
+			
 
 	})
 
 	app.post('/admin/delete-data/:col/:id', (req, res) => {
+
+			if(helper.isUndefined(models[req.params.col])){
+				res.json(helper.error('Collection doesnt exist'));
+				return false;
+			}
+			
+			if(!models[req.params.col].access) {
+				res.json(helper.error('You dont have access to this collection'));
+				return false;
+			}
 
 			models[req.params.col].findOne({_id : req.params.id}, (err, document) => {
 				if(document === null) res.json({error : `${req.params.col} not found.`});
@@ -313,37 +342,46 @@ module.exports = (app) => {
 	});
 
 	app.post('/admin/add-data/:col', (req, res) => {
-		if(!helper.isUndefined(models[req.params.col])){
 
-			const documentData = {};
-
-			for(let key in models[req.params.col].structure){
-				if(!helper.isUndefined(models[req.params.col].structure[key])){
-					documentData[key] = req.body[key] || "";
-				}
-			}
-
-			documentData.url = documentData.url.trim();
-
-			if(documentData.url !== ""){
-				documentData.url = documentData.url.toLowerCase().replace(/ /g, '-');
-			} else {
-				res.json({error : `set url`});
-				return;
-			}
-
-			models.adminuser.findOne({_id : req.session._id}, (err, author)=>{
-				
-				if(author !== null){
-					documentData.author = author.name;
-					const document = new models[req.params.col](documentData);
-					document.save();
-
-					res.json({success : `${req.params.col} has been added`});
-				}
-
-			});
+		if(helper.isUndefined(models[req.params.col])){
+			res.json(helper.error('Collection doesnt exist'));
+			return false;
 		}
+			
+		if(!models[req.params.col].access) {
+			res.json(helper.error('You dont have access to this collection'));
+			return false;
+		}
+
+		const documentData = {};
+
+		for(let key in models[req.params.col].structure){
+			if(!helper.isUndefined(models[req.params.col].structure[key])){
+				documentData[key] = req.body[key] || "";
+			}
+		}
+
+		documentData.url = documentData.url.trim();
+
+		if(documentData.url !== ""){
+			documentData.url = documentData.url.toLowerCase().replace(/ /g, '-');
+		} else {
+			res.json({error : `set url`});
+			return;
+		}
+
+		models.adminuser.findOne({_id : req.session._id}, (err, author)=>{
+			
+			if(author !== null){
+				documentData.author = author.name;
+				const document = new models[req.params.col](documentData);
+				document.save();
+
+				res.json({success : `${req.params.col} has been added`});
+			}
+
+		});
+		
 	});
 
 	get(app, '/admin/change-password', (req, res, data) => {
