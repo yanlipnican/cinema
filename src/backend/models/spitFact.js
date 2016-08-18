@@ -1,13 +1,12 @@
 const model = {
 
-	name : 'post',
+	name : 'spitFact',
 
 	schema : mongoose.Schema({
 		title : {type : String, default : ''},
-		perex : {type : String, default : ''},
 		text  : {type : String, default : ''},
 		author : {type : String, default : ''},
-		url : {type : String, default: ''},
+		url : {type : String, default : ''},
 		visual : {type : String, default: ''}
 	}, {timestamps: true} ),
 
@@ -18,8 +17,7 @@ const model = {
 		title : 'input',
 		url : 'input',
 		visual : 'image',
-		perex : 'wysiwyg',
-		text : 'wysiwyg'
+		text : 'textarea'
 	}
 
 };

@@ -9,7 +9,7 @@
 			{% for key, item in structure %}
 			<div class="row section">
 			    <div class="col-sm-2">
-			    	<h4>{{key}}</h4>
+			    	<h4 class="capitalise">{{key}}</h4>
 			    </div>
 			    <div class="col-sm-10">
 				    {% if item == 'wysiwyg'%}
@@ -18,9 +18,20 @@
 						<input class="data {{ key }}" type="text" name="{{key}}">
 					{% elseif item == 'textarea' %}
 						<textarea name="{{key}}" class="data {{ key }}"></textarea>
+					{% elseif item == 'image' %}
+					<div class="row">
+						<div class="col-sm-4">
+							<input disabled placeholder="Image is not selected" class="data {{key}}" name="{{key}}" >
+						</div>
+						<div class="col-sm-8">
+							<button class="admin-openGallery ml-20 btn btn-primary" data-url="/admin/get-image-gallery" data-save-to="{{ key }}">Select image</button>
+						</div>
+					</div>
 				    {% endif %}
+
 			    </div>
 			</div>
+			<hr>
 			{% endfor %}
 			<a id="add-new" role="button" href="/admin/add-data/{{ colName }}" class="btn btn-primary">Publish</a>
 		</div>

@@ -54,6 +54,8 @@ busBoy.extend(app, {
 
 controllers(app);
 
+// TODO middlewares(app);
+
 app.listen(PORT, () => {
 	console.log(`Project "${config.projectName}" started.\nListening on port ${PORT}!`);
 });

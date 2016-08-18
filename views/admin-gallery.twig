@@ -1,0 +1,8 @@
+<div class="admin-image-gallery">
+    {% for image in images %}
+	    <div class="image">
+			<img src="/{{ image }}" alt="">
+			<span class="name">{{ image }}</span>
+		</div>   
+    {% endfor %}
+</div>

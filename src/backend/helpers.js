@@ -62,6 +62,34 @@ module.exports = {
 
 		return true;
 
+	},
+
+	getCollection : (data, colections, callback) => {
+		
+		(function rec(cols){
+
+			let current = cols[0];
+
+			data[current.name + 's'] = [];
+
+			models[current.name].find().limit(current.limit || 999999).sort({createdAt : current.order || -1}).exec((err, documents) => {
+				
+				for (var i = 0; i < documents.length; i++) {
+					data[current.name + 's'].push(documents[i].toJSON());
+				}
+
+				cols.shift();
+
+				if(cols.length > 0){
+					rec(cols);
+				} else {
+					callback();
+				}
+
+			});
+
+		})(colections);
+
 	}
 	
 }

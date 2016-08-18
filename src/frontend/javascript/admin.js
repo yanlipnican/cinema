@@ -174,4 +174,22 @@ $(document).ready(() =>{
 
 	});
 
+	$('.admin-openGallery').click(function(){
+		
+		let saveTo = $(this).data('save-to');
+		let url = $(this).data('url');
+
+		$('.popup').show();
+		$('.popup .content').html('<span class="loading">Loading</span>');
+
+		$('.popup .content').load(url, function(){
+			$('.admin-image-gallery .image').click(function(){
+				let url = $(this).children('img').attr('src');
+				$('.' + saveTo).val(url);
+				$('.popup').hide();
+			});
+		});
+
+	})
+
 });

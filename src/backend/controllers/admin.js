@@ -21,8 +21,10 @@ const pagination = (req, data, limit) => {
 
 			models[req.params.col].find().limit(limit).skip(limit * page).sort({createdAt : -1}).exec((err, documents) => {
 				data.col = [];
-				for (var i = 0; i < documents.length; i++) {
-					data.col.push(documents[i].toJSON());
+				if(!helper.isUndefined(documents)){
+					for (var i = 0; i < documents.length; i++) {
+						data.col.push(documents[i].toJSON());
+					}
 				}
 
 				resolve();
@@ -61,6 +63,7 @@ const get = (app, route, callback) => {
 
 module.exports = (app) => {
 
+	// TODO : add this at beginning of controllers
 	// midleware controll session
 	app.use('/admin', (req,res,next) => {
 		if(req.session._id || req._parsedUrl.path === "/admin/login" || req._parsedUrl.path === "/admin/register") next();
@@ -183,7 +186,7 @@ module.exports = (app) => {
 		data.title = `Show - ${req.params.col}s`;
 		data.colName = req.params.col;
 
-		const limit = 2;
+		const limit = 5;
 
 		pagination(req, data, limit)
 			.then(() => {
@@ -252,8 +255,6 @@ module.exports = (app) => {
 				return;
 			}
 
-			console.log(data.url);
-
 			models[req.params.col].findOne({_id : req.params.id}, (err, doc) => {
 				if(doc !== null){
 					for(let key in req.body){
@@ -303,41 +304,6 @@ module.exports = (app) => {
 			data.error = 'Collection ' + req.params.col + ' not found.';
 			res.render('admin-add-data.twig', data);
 		}
-
-	});
-
-
-	app.get('/admin/test', (req, res) => {
-		data.title = "Password change";
-		res.render('test-upload.twig');
-	});
-
-	app.post('/admin/test', (req, res) => {
-		
-		console.log(req.body);
-		console.log(req.files);
-
-		var source = fs.createReadStream(req.files.fileToUpload.file);
-		var dest = fs.createWriteStream(appRoot + '/public/upload/images/' + req.files.fileToUpload.filename);
-
-		source.pipe(dest);
-		source.on('end', function() { 
-
-			fs.unlink(req.files.fileToUpload.file, () => {
-				let fileDir = req.files.fileToUpload.file.split('/');
-				fileDir.pop();
-				fileDir = fileDir.join('/');
-				fs.rmdir(fileDir, function(){
-					fileDir = fileDir.split('/');
-					fileDir.pop();
-					fileDir = fileDir.join('/');
-					fs.rmdir(fileDir)
-				});
-			});
-			res.redirect('/admin/test');
-
-		});
-		source.on('error', err => { res.status(500).send('Damn no ! ' + err) });
 
 	});
 
