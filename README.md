@@ -1,7 +1,9 @@
 Cinema web and backend solution. With ticket reservation and everything...
 
-Install project
-  requires node-6 or you need to change preset in .babelrc
-  npm install 
-  gulp build
-  gulp devel / gulp run
+Install project <br>
+-
+
+  requires node-6 or you need to change preset in .babelrc <br>
+  npm install <br>
+  gulp build <br>
+  gulp devel / gulp run <br>
