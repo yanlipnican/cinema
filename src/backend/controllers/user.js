@@ -11,7 +11,7 @@ module.exports = (app) => {
 	});
 
 	app.post('/register', (req, res) => {
-		if(!helper.isEmpty(req.body.email) && !helper.isEmpty(req.body.name) && !helper.isEmpty(req.body.password)){
+		if(!Valid.isEmpty(req.body.email) && !Valid.isEmpty(req.body.name) && !Valid.isEmpty(req.body.password)){
 			
 			let user = new models.user({
 				name: req.body.name,

@@ -12,7 +12,7 @@ if( username !== ""){
 
 mongoose.connect(`mongodb://${username}${config.db.host}:${config.db.port}/${config.db.name}`);
 
-const db = mongoose.connection;
+export const db = mongoose.connection;
 
 db.once('open', () => {
 	console.log(`Connected to DB "${config.db.name}"`);
@@ -23,4 +23,30 @@ db.on('error', (err) => {
 	process.exit(1);
 });
 
-module.exports = db;
+export const getCollection = (data, colections, callback) => {
+		
+	(function rec(cols){
+
+		let current = cols[0];
+
+		data[current.name + 's'] = [];
+		
+		models[current.name].find(current.rules || {}).limit(current.limit || null).skip(current.skip || null).sort({createdAt : current.order || -1}).exec((err, documents) => {
+			
+			for (var i = 0; i < documents.length; i++) {
+				data[current.name + 's'].push(documents[i]);
+			}
+
+			cols.shift();
+
+			if(cols.length > 0){
+				rec(cols);
+			} else {
+				callback();
+			}
+
+		});
+
+	})(colections);
+
+}

@@ -9,7 +9,7 @@ const pagination = (req, data, limit) => {
 	return new Promise(resolve => {
 		let findParams = {};
 		let category = req.params.category;
-		if(!helper.isUndefined(category)) findParams.category = category;
+		if(!Valid.isUndefined(category)) findParams.category = category;
 
 		models[req.params.col].count(findParams, (err, count) => {
 
@@ -23,32 +23,30 @@ const pagination = (req, data, limit) => {
 			data.currentPage = page + 1;
 			data.currentCategory = category;
 
-			models[req.params.col].find().limit(limit).where(findParams).skip(limit * page).sort({ createdAt: -1 }).exec((err, documents) => {
-				data.col = [];
-				if (!helper.isUndefined(documents)) {
-					for (var i = 0; i < documents.length; i++) {
-						data.col.push(documents[i].toJSON());
-					}
-				}
+			let dbData = {};
 
-				if(models[req.params.col].structure.category){
-
-					models.category.find({col : req.params.col}, (err, categories) => {
-
-						data.categories = [];
-
-						for (let i = 0; i < categories.length; i++) {
-							data.categories.push(categories[i].name);
+			db.getCollection(dbData,[
+					{name : req.params.col, limit : limit, skip: limit * page,  rules: findParams}, 
+					{name : 'category'}
+				], 
+				() => {
+					let documents = dbData[req.params.col + 's'];
+					data.col = [];
+					if (documents.length > 0) {
+						for (var i = 0; i < documents.length; i++) {
+							data.col.push(documents[i].toJSON());
 						}
-						resolve();
-
-					});
-
-				} else resolve();
-			});
-
+					}
+					if(models[req.params.col].structure.category){
+						data.categories = [];
+						for (let i = 0; i < dbData.categorys.length; i++) {
+							data.categories.push(dbData.categorys[i].name);
+						}
+					}
+					resolve();
+				}
+			);
 		});
-
 	});
 };
 
@@ -118,7 +116,7 @@ module.exports = (app) => {
 
 			if (count == 0) {
 
-				const valid = helper.validate(req, {
+				const valid = Valid.validate(req, {
 					password: 'empty',
 					repeatPassword: 'empty',
 					email: 'email',
@@ -161,7 +159,7 @@ module.exports = (app) => {
 
 	app.post('/admin/login', (req, res) => {
 
-		const valid = helper.validate(req, {
+		const valid = Valid.validate(req, {
 			name: 'empty',
 			password: 'empty'
 		});
@@ -192,7 +190,7 @@ module.exports = (app) => {
 
 	get(app, '/admin/show-data/:col/:page?/:category?', (req, res, data) => {
 
-		if (helper.isUndefined(models[req.params.col]) || !models[req.params.col].access) {
+		if (Valid.isUndefined(models[req.params.col]) || !models[req.params.col].access) {
 			data.error = 'Collection ' + req.params.col + ' not found.';
 			res.render('show-data.twig', data);
 			return false;
@@ -214,7 +212,7 @@ module.exports = (app) => {
 
 	get(app, '/admin/edit-data/:col/:id', (req, res, data) => {
 
-		if (helper.isUndefined(models[req.params.col])) {
+		if (Valid.isUndefined(models[req.params.col])) {
 			data.error = 'Collection ' + req.params.col + ' not found.';
 			res.render('show-data.twig', data);
 			return false;
@@ -254,13 +252,13 @@ module.exports = (app) => {
 
 	app.post('/admin/edit-data/:col/:id', (req, res) => {
 
-		if (helper.isUndefined(models[req.params.col])) {
+		if (Valid.isUndefined(models[req.params.col])) {
 			res.json({ error: `${req.params.col} not found.` });
 			return false;
 		}
 
 		if (!models[req.params.col].access) {
-			res.json(helper.error('You dont have access to this collection'));
+			res.json(Valid.error('You dont have access to this collection'));
 			return false;
 		}
 
@@ -290,13 +288,13 @@ module.exports = (app) => {
 
 	app.post('/admin/delete-data/:col/:id', (req, res) => {
 
-		if (helper.isUndefined(models[req.params.col])) {
-			res.json(helper.error('Collection doesnt exist'));
+		if (Valid.isUndefined(models[req.params.col])) {
+			res.json(Valid.error('Collection doesnt exist'));
 			return false;
 		}
 
 		if (!models[req.params.col].access) {
-			res.json(helper.error('You dont have access to this collection'));
+			res.json(Valid.error('You dont have access to this collection'));
 			return false;
 		}
 
@@ -312,7 +310,7 @@ module.exports = (app) => {
 
 	get(app, '/admin/add-data/:col', (req, res, data) => {
 		
-		if (!helper.isUndefined(models[req.params.col])) {
+		if (!Valid.isUndefined(models[req.params.col])) {
 			data.title = `Add ${req.params.col}`;
 			data.structure = models[req.params.col].structure;
 			data.colName = req.params.col;
@@ -341,13 +339,13 @@ module.exports = (app) => {
 
 	app.post('/admin/add-data/:col', (req, res) => {
 
-		if (helper.isUndefined(models[req.params.col])) {
-			res.json(helper.error('Collection doesnt exist'));
+		if (Valid.isUndefined(models[req.params.col])) {
+			res.json(Valid.error('Collection doesnt exist'));
 			return false;
 		}
 
 		if (!models[req.params.col].access) {
-			res.json(helper.error('You dont have access to this collection'));
+			res.json(Valid.error('You dont have access to this collection'));
 			return false;
 		}
 
@@ -388,7 +386,7 @@ module.exports = (app) => {
 
 	app.post('/admin/change-password', (req, res) => {
 
-		const valid = helper.validate(req, {
+		const valid = Valid.validate(req, {
 			oldPass: 'empty',
 			newPass: 'empty',
 			newPassRepeat: 'empty'
@@ -422,7 +420,7 @@ module.exports = (app) => {
 
 	app.post('/admin/create-category', (req, res) => {
 
-		const valid = helper.validate(req, {
+		const valid = Valid.validate(req, {
 			name : 'empty',
 			col : 'empty'
 		})

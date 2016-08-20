@@ -13,19 +13,20 @@ import favicon from 'serve-favicon';
 import fs from 'fs';
 
 import config from '../cms-config.json';
-import db from './dbConnection';
+import * as db from './dbConnection';
 import controllers from './controllers';
 import twigHelpers from './twigHelpers';
 import models from './models';
-import helper from './helpers';
+import * as Valid from './validation';
 import hash from './hash';
 
 global.fs = fs;
 global.mongoose = mongoose;
 global.models = models;
-global.helper = helper;
+global.Valid = Valid;
 global.hash = hash;
 global.config = config;
+global.db = db;
 
 global.appRoot = __dirname + '/../';
 

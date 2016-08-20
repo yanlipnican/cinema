@@ -10,9 +10,9 @@ module.exports = (app) => {
 			title : config.projectName
 		};
 
-		helper.getCollection(data,[
-				{name : 'post', limit : 5, order : -1}, 
-				{name : 'spitFact', limit : 3, order : -1}
+		db.getCollection(data,[
+				{name : 'post', limit : 5}, 
+				{name : 'spitFact', limit : 3}
 			], 
 			() => {
 
