@@ -3,9 +3,7 @@
 {% block content %}
 	<div class="container add-data">
 		<div class="row">
-			
 			<h2>{{ title }}</h2>
-			
 			{% for key, item in structure %}
 			<div class="row section">
 			    <div class="col-sm-2">
@@ -27,6 +25,13 @@
 							<button class="admin-openGallery ml-20 btn btn-primary" data-url="/admin/get-image-gallery" data-save-to="{{ key }}">Select image</button>
 						</div>
 					</div>
+					{% elseif item == 'option' %}
+						<select class="data" name="{{ key }}">
+							<option value="">-- Choose {{ key }} --</option>
+							{% for option in attribute(_context, key) %}
+								<option value="{{ option }}">{{ option }}</option>
+							{% endfor %}
+						</select>
 				    {% endif %}
 
 			    </div>

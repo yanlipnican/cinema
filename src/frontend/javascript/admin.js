@@ -7,7 +7,7 @@ $(document).ready(() =>{
    // remove data in /admin/show-data/:col
 
 	$('.show-data .remove').click(function(e){
-		
+		e.preventDefault();
 		if(confirm("Are you sure ?")){
 
 			const address = $(this).attr('href');
@@ -34,15 +34,13 @@ $(document).ready(() =>{
 
 		}
 
-		e.preventDefault();
-
 	});
 
 
 	// add data in /admin/add-data/:col
 
 	$('.add-data #add-new').click(function(e){
-
+		e.preventDefault();
 		const address = $(this).attr('href');
 
 		const data = {};
@@ -72,9 +70,6 @@ $(document).ready(() =>{
 		}).fail(function(){
 			alert('Something went wrong, data hasnt been saved');
 		});
-
-		e.preventDefault();
-
 	});
 
 
@@ -82,7 +77,7 @@ $(document).ready(() =>{
 
 
 	$('.add-data #edit').click(function(e){
-
+		e.preventDefault();
 		const address = $(this).attr('href');
 
 		const data = {};
@@ -112,9 +107,6 @@ $(document).ready(() =>{
 		}).fail(function(){
 			alert('Something went wrong, data hasnt been saved');
 		});
-
-		e.preventDefault();
-
 	});
 
 	$('.add-data').ready(function(){
@@ -128,7 +120,7 @@ $(document).ready(() =>{
 	});
 
 	$('#change-password').submit(function(e){
-
+		e.preventDefault();
 		const address = '/admin/change-password';
 
 		const data = {};
@@ -170,12 +162,10 @@ $(document).ready(() =>{
 			alert('Something went wrong :' + err);
 		});
 
-		e.preventDefault();
-
 	});
 
-	$('.admin-openGallery').click(function(){
-		
+	$('.admin-openGallery').click(function(e){
+		e.preventDefault();
 		let saveTo = $(this).data('save-to');
 		let url = $(this).data('url');
 
@@ -190,6 +180,40 @@ $(document).ready(() =>{
 			});
 		});
 
-	})
+	});
+
+	$('#admin-create-category').click(function(e){
+		e.preventDefault();
+		let collection = $(this).data('collection');
+		let name = prompt('Name the new category');
+
+		if(name.replace(/ /g, '') !== ''){
+			$.ajax({
+				url : '/admin/create-category',
+				data : {
+					name,
+					col : collection
+				},
+				method : 'POST'
+			}).done(function(response){
+				if(response.error){
+					alert(response.error);
+				} else {
+					alert('Category has been created.');
+					location.reload();
+				}
+			}).fail(function(response){
+				alert('Something went wrong');
+			});
+		} else {
+			alert('Category has to have name!');
+		}
+	});
+
+	$('#admin-choose-category').change(function(){
+		let category = $(this).val();
+		let col = $(this).data('col');
+		if(category !== "choose") window.location = `/admin/show-data/${col}/1/${category}`;
+	});
 
 });

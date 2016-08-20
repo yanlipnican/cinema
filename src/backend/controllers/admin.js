@@ -7,8 +7,11 @@
 
 const pagination = (req, data, limit) => {
 	return new Promise(resolve => {
+		let findParams = {};
+		let category = req.params.category;
+		if(!helper.isUndefined(category)) findParams.category = category;
 
-		models[req.params.col].count({}, (err, count) => {
+		models[req.params.col].count(findParams, (err, count) => {
 
 			data.pageCount = Math.ceil(count / limit);
 
@@ -18,8 +21,9 @@ const pagination = (req, data, limit) => {
 			if (page >= data.pageCount) page = data.pageCount - 1;
 
 			data.currentPage = page + 1;
+			data.currentCategory = category;
 
-			models[req.params.col].find().limit(limit).skip(limit * page).sort({ createdAt: -1 }).exec((err, documents) => {
+			models[req.params.col].find().limit(limit).where(findParams).skip(limit * page).sort({ createdAt: -1 }).exec((err, documents) => {
 				data.col = [];
 				if (!helper.isUndefined(documents)) {
 					for (var i = 0; i < documents.length; i++) {
@@ -27,7 +31,20 @@ const pagination = (req, data, limit) => {
 					}
 				}
 
-				resolve();
+				if(models[req.params.col].structure.category){
+
+					models.category.find({col : req.params.col}, (err, categories) => {
+
+						data.categories = [];
+
+						for (let i = 0; i < categories.length; i++) {
+							data.categories.push(categories[i].name);
+						}
+						resolve();
+
+					});
+
+				} else resolve();
 			});
 
 		});
@@ -173,7 +190,7 @@ module.exports = (app) => {
 		req.session.destroy();
 	});
 
-	get(app, '/admin/show-data/:col/:page?', (req, res, data) => {
+	get(app, '/admin/show-data/:col/:page?/:category?', (req, res, data) => {
 
 		if (helper.isUndefined(models[req.params.col]) || !models[req.params.col].access) {
 			data.error = 'Collection ' + req.params.col + ' not found.';
@@ -192,8 +209,6 @@ module.exports = (app) => {
 				res.render('show-data.twig', data);
 
 			});
-
-
 
 	});
 
@@ -216,7 +231,21 @@ module.exports = (app) => {
 				data.document = document.toJSON();
 				data.colName = req.params.col;
 
-				res.render('admin-edit-data.twig', data);
+				if(models[req.params.col].structure.category){
+
+					models.category.find({col : req.params.col}, (err, categories) => {
+
+						data.category = [];
+
+						for (let i = 0; i < categories.length; i++) {
+							data.category.push(categories[i].name);
+						}
+
+						res.render('admin-edit-data.twig', data);
+					});
+				} else {
+					res.render('admin-edit-data.twig', data);
+				}
 			}
 		});
 
@@ -282,12 +311,27 @@ module.exports = (app) => {
 	});
 
 	get(app, '/admin/add-data/:col', (req, res, data) => {
+		
 		if (!helper.isUndefined(models[req.params.col])) {
 			data.title = `Add ${req.params.col}`;
 			data.structure = models[req.params.col].structure;
 			data.colName = req.params.col;
 
-			res.render('admin-add-data.twig', data);
+			if(models[req.params.col].structure.category){
+
+				models.category.find({col : req.params.col}, (err, categories) => {
+
+					data.category = [];
+
+					for (let i = 0; i < categories.length; i++) {
+						data.category.push(categories[i].name);
+					}
+
+					res.render('admin-add-data.twig', data);
+				});
+			} else {
+				res.render('admin-add-data.twig', data);
+			}
 		} else {
 			data.error = 'Collection ' + req.params.col + ' not found.';
 			res.render('admin-add-data.twig', data);
@@ -373,6 +417,32 @@ module.exports = (app) => {
 			res.json({ success: 'Password has been changed' });
 
 		});
+
+	});
+
+	app.post('/admin/create-category', (req, res) => {
+
+		const valid = helper.validate(req, {
+			name : 'empty',
+			col : 'empty'
+		})
+
+		if(valid !== true){
+			res.json(valid);
+			return false;
+		}
+
+		models.category.count({ name : req.body.name }, (err, count) => {
+			if(count === 0){
+
+				let category = new models.category({name : req.body.name, col : req.body.col});
+				category.save();
+				res.json('success');
+
+			} else {
+				res.json({error : 'Category already exists'});
+			}
+		})
 
 	});
 

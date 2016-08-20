@@ -13,12 +13,27 @@
 				{% else %}
 
 					<h2>{{ title }}</h2>
-					<a class="" href="/admin/add-data/{{ colName }}">Add new</a>
+					<div class="row mt-20">
+						<div class="col-sm-4"><a class="" href="/admin/add-data/{{ colName }}">Add new</a></div>
+						<div class="col-sm-4"></div>
+						<div class="col-sm-4 align-right">
+						{% if categories %}
+							<select data-col="{{ colName }}" id="admin-choose-category" name="category" class="mr-20" id="category">
+								<option value="">Show all</option>
+								{% for category in categories %}
+									<option {% if category == currentCategory %} selected {% endif %} value="{{ category }}">{{ category }}</option>
+								{% endfor %}
+							</select>
+							<a href="#" data-collection="{{ colName }}" id="admin-create-category">Add category</a>
+						{% endif %}
+						</div>
+					</div>
 
-					<table class="table">
+					<table class="table mt-20">
 					    <thead>
 					      <tr>
 							<th>Title</th>
+							{% if categories %}<th>Category</th>{% endif %}
 							<th>Date</th>
 							<th>Last update</th>
 							<th>Author</th>
@@ -29,6 +44,7 @@
 					      	{% for doc in col %}
 					      		<tr>
 									<td>{{ doc.title }}</td>
+									{% if categories %}<td>{% if doc.category %}{{ doc.category }}{% else %}-{% endif %}</td>{% endif %}
 									<td>{{ date(doc.createdAt) }}</td>
 									<td>{{ date(doc.updatedAt) }}</td>
 									<td>{{ doc.author }}</td>
@@ -49,7 +65,7 @@
 			<ul class="pagination">
 			{% if pageCount > 1 %}
 				{% for i in 1..pageCount %}
-					<li {% if i == currentPage %} class="active"  {% endif %}><a href="/admin/show-data/{{ colName }}/{{ i }}">{{ i }}</a></li>
+					<li {% if i == currentPage %} class="active"  {% endif %}><a href="/admin/show-data/{{ colName }}/{{ i }}{% if currentCategory %}/{{ currentCategory }}{% endif %}">{{ i }}</a></li>
 				{% endfor %}
 			{% endif %}
 			</ul>
