@@ -40,15 +40,15 @@ twigHelpers(twig);
 
 app.set('view engine', 'twig');
 app.set('views', './views')
-app.use(session({secret: '1203()*(@(*&#)Haskdjh20', resave: true, saveUninitialized: true}));
+app.use(session({ secret: '1203()*(@(*&#)Haskdjh20', resave: true, saveUninitialized: true }));
 app.use(express.static('public'));
 busBoy.extend(app, {
 	upload: true,
-    path: appRoot +'/var/tmp/',
+    path: appRoot + '/var/tmp/',
     allowedPath: /./,
-    mimeTypeLimit : [
-	    'image/jpeg',
-	    'image/png'
+    mimeTypeLimit: [
+		'image/jpeg',
+		'image/png'
 	]
 });
 
