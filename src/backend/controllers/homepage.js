@@ -1,8 +1,4 @@
 module.exports = (app) => {
-	
-	//	
-	// post detail
-	//
 
 	app.get('/', (req, res) => {
 
@@ -10,18 +6,10 @@ module.exports = (app) => {
 			title : config.projectName
 		};
 
-		db.getCollection(data,[
-				{name : 'post', limit : 5}, 
-				{name : 'spitFact', limit : 3}
-			], 
-			() => {
-
-				res.render('home.twig', data);
-
-			}
-		);
+		db.getCollection(data, [{name : 'post', limit : 5}, {name : 'spitFact', limit : 3}], () => {
+			res.render('home.twig', data);
+		});
 
 	});
-
 
 };

@@ -50,35 +50,10 @@ const pagination = (req, data, limit) => {
 	});
 };
 
-
-// base data and operations we need every time we get admin page
-const get = (app, route, callback) => {
-	app.get(route, (req, res) => {
-
-		models.adminuser.findOne({ _id: req.session._id }, (err, admin) => {
-
-			const data = {
-				admin: {
-					name: admin.name
-				}
-			};
-
-			data.cols = [];
-
-			for (let key in models) {
-				if (models[key].access) data.cols.push(models[key]._name);
-			}
-
-			callback(req, res, data);
-
-		});
-
-	});
-};
 module.exports = (app) => {
 
-	get(app, '/admin', (req, res, data) => {
-		res.render('admin-hp.twig', data);
+	app.get('/admin', (req, res) => {
+		res.render('admin-hp.twig', req._cms_data);
 	});
 
 	app.get('/admin/login', (req, res) => {
@@ -179,7 +154,9 @@ module.exports = (app) => {
 		req.session.destroy();
 	});
 
-	get(app, '/admin/show-data/:col/:page?/:category?', (req, res, data) => {
+	app.get('/admin/show-data/:col/:page?/:category?', (req, res) => {
+
+		let data = req._cms_data;
 
 		if (Valid.isUndefined(models[req.params.col]) || !models[req.params.col].access) {
 			data.error = 'Collection ' + req.params.col + ' not found.';
@@ -201,7 +178,9 @@ module.exports = (app) => {
 
 	});
 
-	get(app, '/admin/edit-data/:col/:id', (req, res, data) => {
+	app.get('/admin/edit-data/:col/:id', (req, res) => {
+
+		let data = req._cms_data;
 
 		if (Valid.isUndefined(models[req.params.col])) {
 			data.error = 'Collection ' + req.params.col + ' not found.';
@@ -299,8 +278,10 @@ module.exports = (app) => {
 
 	});
 
-	get(app, '/admin/add-data/:col', (req, res, data) => {
+	app.get('/admin/add-data/:col', (req, res) => {
 		
+		let data = req._cms_data;
+
 		if (!Valid.isUndefined(models[req.params.col])) {
 			data.title = `Add ${req.params.col}`;
 			data.structure = models[req.params.col].structure;
@@ -371,8 +352,8 @@ module.exports = (app) => {
 
 	});
 
-	get(app, '/admin/change-password', (req, res, data) => {
-		res.render('admin-change-password.twig', data);
+	app.get('/admin/change-password', (req, res) => {
+		res.render('admin-change-password.twig', req._cms_data);
 	});
 
 	app.post('/admin/change-password', (req, res) => {
