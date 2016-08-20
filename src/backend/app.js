@@ -19,6 +19,7 @@ import twigHelpers from './twigHelpers';
 import models from './models';
 import * as Valid from './validation';
 import hash from './hash';
+import middlewares from './middlewares';
 
 global.fs = fs;
 global.mongoose = mongoose;
@@ -52,7 +53,7 @@ busBoy.extend(app, {
 		'image/png'
 	]
 });
-
+middlewares(app);
 controllers(app);
 
 // TODO middlewares(app);

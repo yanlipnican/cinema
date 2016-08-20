@@ -77,15 +77,6 @@ const get = (app, route, callback) => {
 };
 module.exports = (app) => {
 
-	// TODO : add this at beginning of controllers
-	// midleware controll session
-	app.use('/admin', (req, res, next) => {
-		if (req.session._id || req._parsedUrl.path === "/admin/login" || req._parsedUrl.path === "/admin/register") next();
-		else {
-			res.redirect('/admin/login');
-		}
-	});
-
 	get(app, '/admin', (req, res, data) => {
 		res.render('admin-hp.twig', data);
 	});
