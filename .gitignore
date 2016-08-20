@@ -7,3 +7,6 @@ public/upload/
 var/
 cms-config.json
 *.log
+.vscode
+.idea
+jsconfig.json
