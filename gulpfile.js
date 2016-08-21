@@ -23,6 +23,7 @@ gulp.task('watch', function () {
   gulp.watch('src/frontend/styles/*.less', ['less']);
 });
 
+
 gulp.task("es6-frontend", function(){
   return gulp.src("src/frontend/javascript/*.js")
     .pipe(babel())
