@@ -247,12 +247,20 @@ module.exports = (app) => {
 
 				if (doc.url !== "") {
 					doc.url = doc.url.toLowerCase().replace(/ /g, '-');
+					models[req.params.col].findOne({ url : doc.url }, (err, one) => {
+						if(one !== null){
+							res.json(Valid.error(req.params.col + ' with this url already exists.'));
+						} else {
+							doc.url = doc.url.toLowerCase().replace(/ /g, '-');
+							doc.save();
+							res.json({ success: `${req.params.col} has been edited` });
+						}
+					});
 				} else {
 					doc.url = doc._id;
+					doc.save();
+					res.json({ success: `${req.params.col} has been edited.` });
 				}
-
-				doc.save();
-				res.json({ success: `${req.params.col} has been edited.` });
 			} else res.json({ error: `${req.params.col} not found.` });
 		});
 
@@ -342,14 +350,20 @@ module.exports = (app) => {
 				document.url = data.url.trim();
 
 				if (document.url !== "") {
-					document.url = document.url.toLowerCase().replace(/ /g, '-');
+					models[req.params.col].findOne({ url : document.url }, (err, one) => {
+						if(one !== null){
+							res.json(Valid.error(req.params.col + ' with this url already exists.'));
+						} else {
+							document.url = document.url.toLowerCase().replace(/ /g, '-');
+							document.save();
+							res.json({ success: `${req.params.col} has been added` });
+						}
+					})
 				} else {
 					document.url = document._id;
+					document.save();
+					res.json({ success: `${req.params.col} has been added` });
 				}
-
-				document.save();
-
-				res.json({ success: `${req.params.col} has been added` });
 			}
 
 		});
