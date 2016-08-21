@@ -66,11 +66,11 @@ module.exports = (app) => {
 		models.adminuser.count((err, count) => {
 
 			if (count == 0) {
-				res.render('admin-register.twig');
+				res.render('admin-register.twig', req._cms_data);
 				return false;
 			}
 
-			res.render('admin-login.twig');
+			res.render('admin-login.twig', req._cms_data);
 
 		});
 
@@ -90,14 +90,15 @@ module.exports = (app) => {
 				});
 
 				if (valid !== true) {
-
-					res.render('admin-register.twig', valid);
+					req._cms_data.error = valid.error;
+					res.render('admin-register.twig', req._cms_data);
 					return false;
 
 				}
 
 				if (req.body.password !== req.body.repeatPassword) {
-					res.render('admin-register.twig', { error: 'You didnt correctly repeated password.' });
+					req._cms_data.error = 'You didnt correctly repeated password.';
+					res.render('admin-register.twig', req._cms_data);
 					return false;
 				}
 
@@ -109,7 +110,8 @@ module.exports = (app) => {
 				let createdPass = newAdmin.createPassword(req.body.password);
 
 				if (createdPass !== true) {
-					res.render('admin-register.twig', createdPass);
+					req._cms_data.error = createdPass.error;
+					res.render('admin-register.twig', req._cms_data);
 					return false;
 				}
 
@@ -131,7 +133,8 @@ module.exports = (app) => {
 		});
 
 		if (valid !== true) {
-			res.render('admin-login.twig', valid);
+			req._cms_data.error = valid.error;
+			res.render('admin-login.twig', req._cms_data);
 			return false;
 		}
 
@@ -140,7 +143,8 @@ module.exports = (app) => {
 				req.session._id = user._id;
 				res.redirect('/admin');
 			} else {
-				res.render('admin-login.twig', { error: 'Wrong email or password' });
+				req._cms_data.error = 'Wrong user name or password.'
+				res.render('admin-login.twig', req._cms_data);
 			}
 		});
 	});
