@@ -22,6 +22,7 @@
     "gulp-less": "^3.1.0",
     "gulp-nodemon": "^2.1.0",
     "gulp-watch": "^4.3.9",
+    "helmet": "^2.1.2",
     "merge-stream": "^1.0.0",
     "mongodb": "^2.2.5",
     "mongoose": "^4.5.8",

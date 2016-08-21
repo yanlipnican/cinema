@@ -10,6 +10,7 @@ import twig from 'twig';
 import session from 'express-session';
 import busBoy from 'express-busboy';
 import favicon from 'serve-favicon';
+import helmet from 'helmet';
 import fs from 'fs';
 
 import config from '../cms-config.json';
@@ -38,8 +39,11 @@ const PORT = 6969;
 // Only for devel, if cache is disabled you don't need to restart server
 // if you modify twig templates
 twig.cache(false);
-twigHelpers(twig);
 
+// helmet sets headers to be secure
+app.use(helmet());
+
+twigHelpers(twig);
 app.set('view engine', 'twig');
 app.set('views', './views')
 app.use(session({ secret: '1203()*(@(*&#)Haskdjh20', resave: true, saveUninitialized: true }));
